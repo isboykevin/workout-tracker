@@ -20,6 +20,7 @@
               diet: '#8B5CF6',  
               exam: '#EF4444', 
               success: '#10B981',
+              warning: '#F59E0B',
               textMuted: '#94A3B8'
             }
           },
@@ -148,7 +149,7 @@
     </header>
 
     <!-- Navigation Tabs -->
-    <nav class="flex p-1.5 glass-panel rounded-2xl mb-6">
+    <nav class="flex p-1.5 glass-panel rounded-2xl mb-4">
       <button id="tabPlanBtn" onclick="switchTab('plan')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-brand-accent text-brand-bg shadow-[0_0_20px_rgba(14,165,233,0.3)]">
         🏋️ Workout
       </button>
@@ -160,16 +161,17 @@
       </button>
     </nav>
 
-    <!-- TAB 1: WORKOUT PLAN -->
-    <div id="planView" class="fade-in">
-      
-      <!-- Day Selector (Session based) -->
-      <div class="no-scrollbar flex gap-2 overflow-x-auto pb-2 mb-4 snap-x">
+    <!-- Shared Day Selector (Visible on Plan & Diet) -->
+    <div id="sharedDaySelectorWrapper" class="fade-in mb-6">
+      <div class="no-scrollbar flex gap-2 overflow-x-auto pb-2 snap-x">
         <div id="daySelector" class="flex gap-2 w-full"></div>
       </div>
+    </div>
 
+    <!-- TAB 1: WORKOUT PLAN -->
+    <div id="planView" class="fade-in">
       <div class="text-xs text-brand-textMuted mb-4 px-1 flex items-center gap-2 font-medium">
-        <span>💡 進度制：不強求連續每天做。準備好再推展下個 Session。</span>
+        <span>💡 進度制：準備好再推展下個 Session。</span>
       </div>
 
       <!-- Day Info Banner -->
@@ -207,7 +209,7 @@
       <!-- Session Notes Input -->
       <div class="mb-6">
         <label class="block text-xs font-bold text-slate-400 mb-2 pl-1">📝 Session 備註 (外食/狀態紀錄)</label>
-        <textarea id="sessionGlobalNote" rows="2" placeholder="例如：午餐外食破戒、今日核心特別無力..." class="w-full bg-slate-900/60 border border-slate-700 rounded-2xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-accent transition-colors resize-none"></textarea>
+        <textarea id="sessionGlobalNote" rows="2" placeholder="例如：今日核心特別無力、動作流暢..." class="w-full bg-slate-900/60 border border-slate-700 rounded-2xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-accent transition-colors resize-none"></textarea>
       </div>
 
       <div class="flex flex-col gap-3 mb-8">
@@ -218,15 +220,22 @@
       </div>
     </div>
 
-    <!-- TAB 2: DIET & NUTRITION (Cycle-based) -->
+    <!-- TAB 2: DIET & NUTRITION -->
     <div id="dietView" class="hidden fade-in mb-8">
       
       <!-- Microbiome Info Panel -->
       <div id="cycleDietBanner" class="relative overflow-hidden glass-panel rounded-3xl p-5 mb-5 border-l-4 border-l-brand-diet">
         <div class="absolute -right-2 -top-2 text-6xl opacity-10">🦠</div>
-        <div class="flex justify-between items-start mb-2 relative z-10">
-          <h2 class="text-base font-black text-white">腸道微生態輪換矩陣</h2>
-          <span class="text-[10px] font-extrabold px-2 py-1 rounded-lg border bg-brand-diet/20 text-brand-diet border-brand-diet/30 uppercase tracking-widest" id="dietCycleTag">CYCLE 1</span>
+        <div class="flex justify-between items-center mb-3 relative z-10">
+          <h2 class="text-[15px] font-black text-white flex items-center gap-2">
+            腸道微生態矩陣
+          </h2>
+          <!-- Cycle Preview Selector -->
+          <select id="cyclePreviewSelect" onchange="changeCyclePreview(this.value)" class="text-[10px] font-extrabold px-2 py-1.5 rounded-lg border bg-brand-diet/20 text-brand-diet border-brand-diet/30 uppercase tracking-widest outline-none cursor-pointer">
+            <option value="1">CYCLE 1</option>
+            <option value="2">CYCLE 2</option>
+            <option value="3">CYCLE 3</option>
+          </select>
         </div>
         <p class="text-[11px] text-slate-300 relative z-10 leading-relaxed font-medium mb-3">
           防止腸道菌相單一化。透過每 7 個訓練日自動更換蔬菜組合，確保益生菌定植及多元植化素抗氧攝取。
@@ -237,36 +246,12 @@
         </div>
       </div>
 
-      <!-- Daily Habit Checkbox (Persistent for today) -->
+      <!-- Daily Habit Checkbox (Purified to Water Only) -->
       <h3 class="text-sm font-extrabold text-white mb-3 mt-6">基礎營養任務 (Daily)</h3>
-      <div class="glass-panel rounded-2xl p-4 mb-5 border border-slate-700/60 flex flex-col gap-3">
+      <div class="glass-panel rounded-2xl p-4 mb-5 border border-slate-700/60">
         <label class="flex items-center gap-3 cursor-pointer">
-          <input type="checkbox" id="dietHabit1" class="custom-checkbox diet-checkbox w-5 h-5 rounded-md" onchange="saveDietHabits()">
-          <span class="text-xs font-bold text-slate-200 flex-1">3L+ 清水 (排走乳酸與肌酸水分)</span>
-        </label>
-        <div class="h-px bg-slate-700/50 w-full"></div>
-        <label class="flex items-center gap-3 cursor-pointer">
-          <input type="checkbox" id="dietHabit2" class="custom-checkbox diet-checkbox w-5 h-5 rounded-md" onchange="saveDietHabits()">
-          <span class="text-[11px] font-medium text-slate-200 flex-1">
-            <strong class="text-white text-xs block mb-0.5">統一早餐</strong>
-            Cheerios燕麥圈(40g) + 無糖大豆高鈣250ml + 雞蛋2隻 + 奇異果1個
-          </span>
-        </label>
-        <div class="h-px bg-slate-700/50 w-full"></div>
-        <label class="flex items-center gap-3 cursor-pointer">
-          <input type="checkbox" id="dietHabit4" class="custom-checkbox diet-checkbox w-5 h-5 rounded-md" onchange="saveDietHabits()">
-          <span class="text-[11px] font-medium text-slate-200 flex-1">
-            <strong class="text-white text-xs block mb-0.5">下午茶補給</strong>
-            無糖脫脂希臘乳酪 150g (穩定血糖、補足酪蛋白與益生菌)
-          </span>
-        </label>
-        <div class="h-px bg-slate-700/50 w-full"></div>
-        <label class="flex items-center gap-3 cursor-pointer">
-          <input type="checkbox" id="dietHabit3" class="custom-checkbox diet-checkbox w-5 h-5 rounded-md" onchange="saveDietHabits()">
-          <span class="text-[11px] font-medium text-slate-200 flex-1">
-            <strong class="text-white text-xs block mb-0.5">維他命矩陣</strong>
-            早餐後：黑咖啡 + 維 B雜 <br>午餐後：維 C (助三價鐵轉化為二價鐵)
-          </span>
+          <input type="checkbox" id="dietHabitWater" class="custom-checkbox diet-checkbox w-6 h-6 rounded-md" onchange="saveWaterHabit()">
+          <span class="text-xs font-bold text-slate-200 flex-1">💧 3L+ 清水 (全天候排走乳酸與肌酸水分)</span>
         </label>
       </div>
 
@@ -277,7 +262,6 @@
           <span class="text-[9px] bg-brand-accent/20 text-brand-accent px-2 py-0.5 rounded border border-brand-accent/30">Day 1-6</span>
         </h3>
         <div class="glass-panel rounded-2xl p-4 mb-5 border border-brand-accent/30 bg-brand-accent/5">
-          
           <div class="mb-4">
             <div class="text-xs font-bold text-white mb-2 flex items-center gap-1.5"><span class="text-sm">⚡</span> 運動前 45 分鐘</div>
             <div class="flex gap-2 mb-2">
@@ -289,11 +273,10 @@
               <span class="text-base mt-0.5">💡</span>
               <div class="text-[10px] text-slate-300 font-medium leading-relaxed">
                 <strong class="text-brand-success block mb-1">天然電解質優勢:</strong>
-                帶鹽分的核桃不用刻意清洗。微量鹽分（鈉）能在高強度衝刺或重訓中，有效幫助神經傳導，預防抽筋並提升肌肉收縮力。
+                帶鹽分的核桃不用刻意清洗。微量鹽分能在高強度衝刺或重訓中幫助神經傳導，提升肌肉收縮力。
               </div>
             </div>
           </div>
-
           <div class="border-t border-brand-accent/20 pt-4">
             <div class="text-xs font-bold text-white mb-2 flex items-center gap-1.5"><span class="text-sm">💪</span> 運動後即時</div>
             <div class="flex gap-2">
@@ -307,12 +290,12 @@
       <div id="day7RecoveryArea" class="hidden glass-panel rounded-2xl p-5 mb-5 border border-slate-500/30 bg-slate-800/30 text-center">
         <span class="text-2xl mb-2 block">🧘‍♂️</span>
         <h4 class="text-sm font-bold text-white mb-1">Active Recovery (無訓練日)</h4>
-        <p class="text-[11px] text-slate-400 font-medium">今日停用香蕉、核桃、蛋白粉與肌酸，讓受體與肝臟重置。</p>
+        <p class="text-[11px] text-slate-400 font-medium leading-relaxed">今日停用香蕉、核桃與蛋白粉，讓肝臟與腸胃重置。<br><span class="text-brand-success font-bold mt-1 block">*(肌酸維持服用，保持肌肉飽和度)*</span></p>
       </div>
 
       <!-- Dynamic Meals for Current Session -->
       <h3 class="text-sm font-extrabold text-white mb-3 mt-6 flex items-center gap-2">
-        <span id="mealSessionTitle">Session 1</span> 餐單與烹調指令
+        <span id="mealSessionTitle">Session 1</span> 全日餐單 (結合營養補給)
       </h3>
       <div id="mealsContainer" class="flex flex-col gap-4">
         <!-- Injected via JS based on Session and Cycle -->
@@ -430,7 +413,7 @@
           { id: "s5-1", name: "Incline DB Press", target: "3 x 8-12", rest: "90s", defaultWeight: "-", defaultReps: "8-12", note: "Bench at 30 degrees. Focus on upper chest.", tags: ['Chest'] },
           { id: "s5-2", name: "Seated Cable Row", target: "4 x 10-12", rest: "75s", defaultWeight: "-", defaultReps: "10-12", note: "Squeeze shoulder blades.", tags: ['Back'] },
           { id: "s5-3", name: "Lateral Raise (DB)", target: "4 x 15", rest: "60s", defaultWeight: "-", defaultReps: "15", note: "Builds V-Taper aesthetics.", tags: ['Shoulder'] },
-          { id: "s5-4", name: "Bodyweight Push-ups", target: "3 x Max", rest: "120s", defaultWeight: "BW", defaultReps: "Max", note: "PI EXAM: 極限測試，嘗試超越 Session 1 的表現。", tags: ['PI-Exam'] },
+          { id: "s5-4", name: "Bodyweight Push-ups", target: "3 x Max", rest: "120s", defaultWeight: "BW", defaultReps: "Max", note: "⚠️ 極限測試：確保動作絕對標準 (Chest to fist height)。若前兩組已力竭，第三組務必改為 Knee Push-ups (跪姿) 補足容量，嚴禁核心塌陷代償，以免考試被 No Count。", tags: ['PI-Exam'] },
           { id: "s5-5", name: "1-Min Timed Sit-ups", target: "3 x 1 Min", rest: "90s", defaultWeight: "-", defaultReps: "Max", note: "PI EXAM: Max speed.", tags: ['PI-Exam'] }
         ]
       },
@@ -449,7 +432,7 @@
         title: "Session 7 | Active Recovery",
         typeTag: "bg-slate-600/30 text-slate-400 border-slate-600/50",
         typeName: "💤 AUX",
-        desc: "Flush lactic acid, clear creatine water retention.",
+        desc: "Flush lactic acid, muscle fiber recovery.",
         warmup: "Deep Breathing",
         exercises: [
           { id: "s7-1", name: "Foam Rolling", target: "15 Mins", rest: "-", defaultWeight: "-", defaultReps: "Done", note: "Focus heavily on calves and IT band.", tags: ['Recovery'] },
@@ -463,24 +446,22 @@
        ========================================================= */
     const cycleData = {
       1: {
-        name: "CYCLE 1 (經典基礎)",
+        name: "CYCLE 1",
         desc: "番茄 (茄紅素) + 西蘭花 (十字花科防癌) + 紅蘿蔔 (β-胡蘿蔔素) + 菠菜 (鐵質)。建立穩定的消化基礎。",
         veg: { v1: "番茄", v2: "西蘭花", v3: "紅蘿蔔", v4: "菠菜" }
       },
       2: {
-        name: "CYCLE 2 (益生元強化)",
-        desc: "洋蔥 (菊糖) + 蘆筍 (低聚果糖) + 三色椒 (維他命C) + 鮮冬菇 (多醣體)。專攻腸道好菌定植，極速擴大菌相多樣性。",
+        name: "CYCLE 2",
+        desc: "洋蔥 (菊糖) + 蘆筍 (低聚果糖) + 三色椒 (維他命C) + 鮮冬菇 (多醣體)。專攻腸道好菌定植，擴大菌相多樣性。",
         veg: { v1: "洋蔥", v2: "蘆筍", v3: "三色椒", v4: "鮮冬菇" }
       },
       3: {
-        name: "CYCLE 3 (高纖植化素)",
+        name: "CYCLE 3",
         desc: "南瓜粒 (優質複合碳水) + 紫椰菜 (花青素抗炎) + 翠玉瓜 (高鉀去水腫) + 小棠菜 (鈣質)。強大抗氧化，深層修復肌肉發炎。",
         veg: { v1: "南瓜粒", v2: "紫椰菜", v3: "翠玉瓜", v4: "小棠菜" }
       }
     };
 
-    // Meal Blueprints based on Session (1-7)
-    // Note: Kept structurally same, but logically follows the Session day
     const mealBlueprints = {
       1: { 
         lunch: { meat: "特瘦免治牛肉 150g", carb: "白飯 1 碗", veg: ["[v1]", "[v2]"], method: "電飯煲底層洗米放水放[v1]，飯熟前 5 分鐘鋪[v2]。平底鑊「不落油」乾炒牛肉，灑海鹽黑椒，逼出的牛油汁徹底倒掉，拌勻。" },
@@ -518,13 +499,23 @@
     let currentLogs = JSON.parse(localStorage.getItem('pi_workout_logs_v3') || '[]');
     let currentSession = 1;
     let activeCycle = 1;
+    let previewCycle = 1; // Used for UI checking different cycles in Diet tab
+    
     let timerInterval = null;
     let targetEndTime = 0;
+    
+    let historyRenderLimit = 20;
+
+    // Timezone safe getters
+    function getHKDate() { return new Date().toLocaleDateString('en-CA', {timeZone: 'Asia/Hong_Kong'}); }
+    function getHKTime() { return new Date().toLocaleTimeString('en-GB', {timeZone: 'Asia/Hong_Kong', hour: '2-digit', minute:'2-digit'}); }
 
     function calculateProgress() {
       const totalCompleted = currentLogs.length;
       activeCycle = Math.floor(totalCompleted / 7) % 3 + 1; // 1, 2, 3 loop
       currentSession = (totalCompleted % 7) + 1; // 1 to 7
+      previewCycle = activeCycle; // reset preview
+      document.getElementById('cyclePreviewSelect').value = previewCycle;
     }
 
     function initApp() {
@@ -532,19 +523,20 @@
       updateTotalStats();
       renderDaySelector();
       selectDay(currentSession);
-      loadDietHabits();
+      loadWaterHabit();
     }
 
     function switchTab(tab) {
       const planView = document.getElementById('planView');
       const dietView = document.getElementById('dietView');
       const historyView = document.getElementById('historyView');
+      const sharedDaySelector = document.getElementById('sharedDaySelectorWrapper');
       
       const tabPlanBtn = document.getElementById('tabPlanBtn');
       const tabDietBtn = document.getElementById('tabDietBtn');
       const tabHistoryBtn = document.getElementById('tabHistoryBtn');
 
-      // Reset tabs
+      // Reset
       planView.classList.add('hidden');
       dietView.classList.add('hidden');
       historyView.classList.add('hidden');
@@ -554,15 +546,18 @@
       tabHistoryBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200 bg-transparent";
 
       if (tab === 'plan') {
+        sharedDaySelector.classList.remove('hidden');
         planView.classList.remove('hidden');
         tabPlanBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-brand-accent text-brand-bg shadow-[0_0_20px_rgba(14,165,233,0.3)]";
       } else if (tab === 'diet') {
+        sharedDaySelector.classList.remove('hidden');
         dietView.classList.remove('hidden');
         tabDietBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-brand-diet text-white shadow-[0_0_20px_rgba(139,92,246,0.3)]";
-        renderDietPlan(currentSession, activeCycle);
       } else {
+        sharedDaySelector.classList.add('hidden');
         historyView.classList.remove('hidden');
         tabHistoryBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-brand-accent text-brand-bg shadow-[0_0_20px_rgba(14,165,233,0.3)]";
+        historyRenderLimit = 20; // reset
         renderHistoryLogs();
       }
     }
@@ -588,7 +583,10 @@
       container.innerHTML = html;
     }
 
+    // Handles picking a day on both Plan and Diet tab
+    let selectedUIdays = 1;
     function selectDay(sessNum) {
+      selectedUIdays = sessNum;
       for (let i = 1; i <= 7; i++) {
         const pill = document.getElementById(`pill-${i}`);
         if(pill) {
@@ -612,8 +610,13 @@
       }
 
       renderWorkoutPlan(sessNum);
-      renderDietPlan(sessNum, activeCycle); // Sync Diet Tab
+      renderDietPlan(sessNum, previewCycle); 
       document.getElementById(`pill-${sessNum}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+
+    function changeCyclePreview(cycleVal) {
+      previewCycle = parseInt(cycleVal);
+      renderDietPlan(selectedUIdays, previewCycle);
     }
 
     function renderWorkoutPlan(sessNum) {
@@ -637,15 +640,24 @@
         const cardClass = isExam ? "exam-highlight" : "border-brand-border/60";
         const tags = ex.tags ? ex.tags.map(t => `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${t==='PI-Exam'?'bg-brand-exam text-white':'bg-slate-700 text-slate-300'} uppercase tracking-wide">${t}</span>`).join('') : '';
 
-        // Past data auto-fill
+        // Past data auto-fill & overload visual logic
         let histWeight = ex.defaultWeight;
         let histReps = ex.defaultReps;
+        let hasPastData = false;
+        
         for (let log of currentLogs) {
            const pastRecord = log.items.find(i => i.name === ex.name);
            if (pastRecord && pastRecord.weight && pastRecord.weight !== "-") {
-              histWeight = pastRecord.weight; histReps = pastRecord.reps; break;
+              histWeight = pastRecord.weight; 
+              histReps = pastRecord.reps; 
+              hasPastData = true;
+              break;
            }
         }
+
+        // Highlight inputs if there is a past record to beat (Progressive Overload UI)
+        let wtInputClass = hasPastData ? "bg-slate-800 border-brand-accent ring-1 ring-brand-accent text-brand-accent placeholder-brand-accent/70" : "bg-slate-900 border-slate-700 text-brand-accent placeholder-brand-accent/50";
+        let repInputClass = hasPastData ? "bg-slate-800 border-brand-success ring-1 ring-brand-success text-brand-success placeholder-brand-success/70" : "bg-slate-900 border-slate-700 text-white placeholder-slate-500";
 
         return `
         <div class="glass-panel rounded-2xl p-4 transition-all duration-300 border ${cardClass}" id="card-${ex.id}">
@@ -660,12 +672,12 @@
                 <span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-brand-accent">🎯 ${ex.target}</span>
                 <span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-400">⏱️ ${ex.rest}</span>
               </div>
-              <div class="text-[11px] font-medium text-brand-textMuted bg-slate-900/40 p-2.5 rounded-xl border border-slate-700/50 leading-relaxed">💡 ${ex.note}</div>
+              <div class="text-[11px] font-medium text-brand-textMuted bg-slate-900/40 p-2.5 rounded-xl border border-slate-700/50 leading-relaxed">${ex.note}</div>
             </div>
           </div>
           <div class="grid grid-cols-12 gap-3 mt-4 pt-4 border-t border-slate-700/50">
-            <div class="col-span-4 flex flex-col gap-1.5"><label class="text-[9px] font-bold text-slate-500 uppercase">Weight</label><input type="text" id="wt-${ex.id}" placeholder="${histWeight !== ex.defaultWeight ? `Last: ${histWeight}` : ex.defaultWeight}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-brand-accent focus:outline-none focus:border-brand-accent"></div>
-            <div class="col-span-4 flex flex-col gap-1.5"><label class="text-[9px] font-bold text-slate-500 uppercase">Reps</label><input type="text" id="rep-${ex.id}" placeholder="${histReps !== ex.defaultReps ? `Last: ${histReps}` : ex.defaultReps}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-brand-accent"></div>
+            <div class="col-span-4 flex flex-col gap-1.5"><label class="text-[9px] font-bold text-slate-500 uppercase flex justify-between">Weight ${hasPastData?'<span class="text-[8px] text-brand-accent">BEAT IT</span>':''}</label><input type="text" id="wt-${ex.id}" placeholder="${hasPastData ? `Last: ${histWeight}` : ex.defaultWeight}" class="w-full rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none transition-colors ${wtInputClass}"></div>
+            <div class="col-span-4 flex flex-col gap-1.5"><label class="text-[9px] font-bold text-slate-500 uppercase flex justify-between">Reps ${hasPastData?'<span class="text-[8px] text-brand-success">BEAT IT</span>':''}</label><input type="text" id="rep-${ex.id}" placeholder="${hasPastData ? `Last: ${histReps}` : ex.defaultReps}" class="w-full rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none transition-colors ${repInputClass}"></div>
             <div class="col-span-4 flex flex-col gap-1.5"><label class="text-[9px] font-bold text-slate-500 uppercase">Notes</label><input type="text" id="nt-${ex.id}" placeholder="e.g. Hard" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-brand-accent"></div>
           </div>
         </div>
@@ -694,7 +706,6 @@
     }
 
     function renderDietPlan(sessNum, cycle) {
-      document.getElementById('dietCycleTag').innerText = `CYCLE ${cycle}`;
       document.getElementById('dietCycleVegText').innerText = cycleData[cycle].desc;
       
       const supArea = document.getElementById('workoutSupplementsArea');
@@ -713,67 +724,80 @@
       const vMap = cycleData[cycle].veg;
       const blueprint = mealBlueprints[sessNum];
 
-      const renderMealCard = (type, data) => {
-        let finalVegStr = data.veg.map(v => {
-          if(v === "[v1]") return `<span class="text-brand-diet font-bold">${vMap.v1}</span>`;
-          if(v === "[v2]") return `<span class="text-brand-diet font-bold">${vMap.v2}</span>`;
-          if(v === "[v3]") return `<span class="text-brand-diet font-bold">${vMap.v3}</span>`;
-          if(v === "[v4]") return `<span class="text-brand-diet font-bold">${vMap.v4}</span>`;
-          return v;
-        }).join(" + ");
+      const renderMealCard = (type, data, supplement = null) => {
+        let finalVegStr = "";
+        if (data.veg && data.veg.length > 0) {
+            finalVegStr = data.veg.map(v => {
+            if(v === "[v1]") return `<span class="text-brand-diet font-bold">${vMap.v1}</span>`;
+            if(v === "[v2]") return `<span class="text-brand-diet font-bold">${vMap.v2}</span>`;
+            if(v === "[v3]") return `<span class="text-brand-diet font-bold">${vMap.v3}</span>`;
+            if(v === "[v4]") return `<span class="text-brand-diet font-bold">${vMap.v4}</span>`;
+            return v;
+          }).join(" + ");
+        }
 
-        let finalMethod = data.method
-          .replace(/\[v1\]/g, vMap.v1).replace(/\[v2\]/g, vMap.v2)
-          .replace(/\[v3\]/g, vMap.v3).replace(/\[v4\]/g, vMap.v4);
+        let finalMethod = "";
+        if (data.method) {
+            finalMethod = data.method
+            .replace(/\[v1\]/g, vMap.v1).replace(/\[v2\]/g, vMap.v2)
+            .replace(/\[v3\]/g, vMap.v3).replace(/\[v4\]/g, vMap.v4);
+        }
+
+        const icon = type.includes('Breakfast') ? '🌅' : type.includes('Lunch') ? '☀️' : type.includes('Snack') ? '☕' : '🌙';
 
         return `
           <div class="glass-panel rounded-2xl p-4 border border-slate-700/60 relative overflow-hidden">
             <div class="absolute right-0 top-0 bottom-0 w-1 bg-brand-diet/50"></div>
             <div class="flex items-center gap-2 mb-3 border-b border-slate-700/50 pb-2">
-              <span class="text-lg">${type === 'Lunch' ? '☀️' : '🌙'}</span>
+              <span class="text-lg">${icon}</span>
               <h4 class="text-sm font-black text-white tracking-wide uppercase">${type}</h4>
             </div>
+            
+            ${supplement ? `
+            <div class="bg-brand-diet/20 border border-brand-diet/30 p-2.5 rounded-xl text-[11px] text-purple-200 font-medium mb-3 flex items-start gap-2">
+              <span class="text-sm leading-none">💊</span>
+              <div><strong class="text-brand-diet block mb-0.5">營養學補給綁定：</strong>${supplement}</div>
+            </div>` : ''}
+
             <div class="flex flex-col gap-1.5 mb-3">
-              <div class="text-[13px] text-slate-200">🥩 肉類： <span class="font-bold text-white">${data.meat}</span></div>
-              <div class="text-[13px] text-slate-200">🍚 碳水： <span class="font-bold text-white">${data.carb}</span></div>
-              <div class="text-[13px] text-slate-200">🥦 蔬菜： ${finalVegStr}</div>
+              ${data.meat ? `<div class="text-[13px] text-slate-200">🥩 蛋白質： <span class="font-bold text-white">${data.meat}</span></div>` : ''}
+              ${data.carb ? `<div class="text-[13px] text-slate-200">🍚 碳水： <span class="font-bold text-white">${data.carb}</span></div>` : ''}
+              ${finalVegStr ? `<div class="text-[13px] text-slate-200">🥦 蔬菜： ${finalVegStr}</div>` : ''}
             </div>
+            
+            ${finalMethod ? `
             <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700 text-[11px] text-brand-textMuted leading-relaxed">
               <strong class="text-slate-300 block mb-1">🔥 唯一煮法：</strong>
               ${finalMethod}
-            </div>
+            </div>` : ''}
           </div>
         `;
       };
 
+      // Integrated Timeline Rendering
       document.getElementById('mealsContainer').innerHTML = 
-        renderMealCard('Lunch', blueprint.lunch) + 
+        renderMealCard('Breakfast', { meat: "雞蛋 2 隻 + 無糖大豆高鈣 250ml", carb: "Cheerios 燕麥圈 40g", veg: ["奇異果 1 個"] }, "黑咖啡 + 維 B 雜 (協同產生 ATP 能量)") + 
+        renderMealCard('Lunch', blueprint.lunch, "維他命 C (將植物性/肉類的三價鐵 Fe3+ 還原為二價鐵 Fe2+，大幅提升吸收率)") + 
+        renderMealCard('Snack (下午茶)', { meat: "無糖脫脂希臘乳酪 150g", carb: "", veg: [] }, "穩定血糖、補足酪蛋白與腸道益生菌") +
         renderMealCard('Dinner', blueprint.dinner);
     }
 
-    function loadDietHabits() {
-      const today = new Date().toISOString().split('T')[0];
-      let stored = JSON.parse(localStorage.getItem('pi_diet_habits_v2') || '{}');
-      if (stored.date !== today) stored = { date: today, h1: false, h2: false, h3: false, h4: false };
-      document.getElementById('dietHabit1').checked = stored.h1;
-      document.getElementById('dietHabit2').checked = stored.h2;
-      document.getElementById('dietHabit3').checked = stored.h3;
-      document.getElementById('dietHabit4').checked = stored.h4;
+    function loadWaterHabit() {
+      const today = getHKDate();
+      let stored = JSON.parse(localStorage.getItem('pi_diet_habits_water_v3') || '{}');
+      if (stored.date !== today) stored = { date: today, h1: false };
+      document.getElementById('dietHabitWater').checked = stored.h1;
     }
     
-    function saveDietHabits() {
-      localStorage.setItem('pi_diet_habits_v2', JSON.stringify({
-        date: new Date().toISOString().split('T')[0],
-        h1: document.getElementById('dietHabit1').checked,
-        h2: document.getElementById('dietHabit2').checked,
-        h3: document.getElementById('dietHabit3').checked,
-        h4: document.getElementById('dietHabit4').checked
+    function saveWaterHabit() {
+      localStorage.setItem('pi_diet_habits_water_v3', JSON.stringify({
+        date: getHKDate(),
+        h1: document.getElementById('dietHabitWater').checked
       }));
     }
 
     function saveTodayRecord() {
       const dayData = appSchedule[currentSession];
-      const now = new Date();
       let completedCount = 0;
       let itemsRecorded = [];
       const globalNote = document.getElementById('sessionGlobalNote').value.trim();
@@ -781,11 +805,14 @@
       dayData.exercises.forEach(ex => {
         const isDone = document.getElementById(`chk-${ex.id}`).checked;
         if (isDone) completedCount++;
+        let wtVal = document.getElementById(`wt-${ex.id}`).value || document.getElementById(`wt-${ex.id}`).placeholder.replace('Last: ', '');
+        let repVal = document.getElementById(`rep-${ex.id}`).value || document.getElementById(`rep-${ex.id}`).placeholder.replace('Last: ', '');
+        
         itemsRecorded.push({
           name: ex.name,
           done: isDone,
-          weight: document.getElementById(`wt-${ex.id}`).value || document.getElementById(`wt-${ex.id}`).placeholder.replace('Last: ', ''),
-          reps: document.getElementById(`rep-${ex.id}`).value || document.getElementById(`rep-${ex.id}`).placeholder.replace('Last: ', ''),
+          weight: wtVal,
+          reps: repVal,
           note: document.getElementById(`nt-${ex.id}`).value,
           isExam: ex.tags && ex.tags.includes('PI-Exam')
         });
@@ -793,10 +820,10 @@
 
       const newLog = {
         id: 'log_' + Date.now(),
-        date: `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`,
-        time: `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`,
+        date: getHKDate(),
+        time: getHKTime(),
         sessionNum: currentSession,
-        cycleNum: activeCycle,
+        cycleNum: activeCycle, // Always lock the save to actual progression
         title: dayData.title,
         completedCount: completedCount,
         totalItems: dayData.exercises.length,
@@ -807,10 +834,8 @@
       currentLogs.unshift(newLog);
       localStorage.setItem('pi_workout_logs_v3', JSON.stringify(currentLogs));
       
-      // Clear note
       document.getElementById('sessionGlobalNote').value = '';
 
-      // Advance Progression
       calculateProgress();
       updateTotalStats();
       renderDaySelector();
@@ -833,7 +858,10 @@
         container.innerHTML = `<div class="text-center py-12 text-slate-500 glass-panel rounded-3xl border border-dashed border-slate-700"><div class="text-4xl mb-3 opacity-50">📭</div><p class="font-bold text-sm">No Logs Yet</p></div>`;
         return;
       }
-      container.innerHTML = currentLogs.map(log => {
+
+      const logsToRender = currentLogs.slice(0, historyRenderLimit);
+      
+      let html = logsToRender.map(log => {
         const rate = Math.round((log.completedCount / log.totalItems) * 100);
         return `
         <div class="glass-panel rounded-3xl p-5 border border-brand-border/50">
@@ -870,6 +898,17 @@
           </div>
         </div>
       `}).join('');
+
+      if (currentLogs.length > historyRenderLimit) {
+        html += `<button onclick="loadMoreHistory()" class="w-full py-3 mt-2 text-xs font-bold text-brand-textMuted glass-panel rounded-2xl hover:bg-slate-800 transition-colors border border-slate-700/50">⬇️ Load More (${currentLogs.length - historyRenderLimit} remaining)</button>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function loadMoreHistory() {
+      historyRenderLimit += 20;
+      renderHistoryLogs();
     }
 
     function deleteLog(id) {
@@ -881,6 +920,7 @@
       }
     }
 
+    // Timer Logic & Background Throttling Fix
     function startTimer(seconds) {
       stopTimer();
       targetEndTime = Date.now() + seconds * 1000;
@@ -896,11 +936,12 @@
         } else {
           updateTimerDisplay(remaining);
         }
-      }, 200); // Higher frequency check for mobile background throttling
+      }, 200);
     }
 
     function stopTimer() { 
       clearInterval(timerInterval); 
+      timerInterval = null;
       updateTimerDisplay(0); 
       document.getElementById('timerContainer').classList.remove('timer-active');
     }
@@ -912,6 +953,18 @@
       d.className = `text-3xl font-black tabular-nums leading-none tracking-tight ${remainingSeconds > 0 && remainingSeconds <= 10 ? 'text-brand-exam' : 'text-brand-success'}`;
     }
 
+    // Fix for iOS/Android throttling setInterval in background
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && timerInterval && targetEndTime) {
+        let remaining = Math.round((targetEndTime - Date.now()) / 1000);
+        if (remaining > 0) {
+          updateTimerDisplay(remaining);
+        } else {
+          stopTimer();
+        }
+      }
+    });
+
     function showToast(msg) {
       document.getElementById('toastMsg').innerText = msg;
       document.getElementById('toast').classList.add('show');
@@ -921,7 +974,7 @@
     function exportData() {
       const a = document.createElement('a');
       a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentLogs, null, 2));
-      a.download = `PI_Tracker_Backup.json`;
+      a.download = `PI_Tracker_Backup_${getHKDate()}.json`;
       a.click();
     }
 
@@ -934,7 +987,6 @@
       reader.onload = function(ev) {
         try {
           const imported = JSON.parse(ev.target.result);
-          // Basic schema validation
           if (Array.isArray(imported) && imported.every(i => i.id && i.items)) {
             currentLogs = imported;
             localStorage.setItem('pi_workout_logs_v3', JSON.stringify(currentLogs));
