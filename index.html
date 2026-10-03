@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="zh-HK" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PI Prep x Lean Legs | Workout Tracker</title>
+  <title>PI Prep x Lean Legs | Ultimate Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -16,14 +16,15 @@
               panel: '#1E293B',
               border: '#334155',
               accent: '#0EA5E9',
-              accentGlow: 'rgba(14, 165, 233, 0.4)',
-              exam: '#EF4444', // Red for PI Exam
+              cycle: '#10B981', /* 專屬 Cycle 綠色 */
+              diet: '#8B5CF6',  /* 專屬 Diet 紫色 */
+              exam: '#EF4444', 
               success: '#10B981',
               textMuted: '#94A3B8'
             }
           },
           fontFamily: {
-            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
           }
         }
       }
@@ -31,7 +32,7 @@
   </script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
     body {
       background-color: #0B1120;
@@ -41,27 +42,28 @@
       font-family: 'Inter', sans-serif;
     }
 
-    /* Hide Scrollbar but keep functionality */
     ::-webkit-scrollbar { width: 0px; height: 0px; display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* Glassmorphism Panels */
     .glass-panel {
-      background: rgba(30, 41, 59, 0.6);
+      background: rgba(30, 41, 59, 0.65);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     }
 
-    /* PI Exam Highlight */
     .exam-highlight {
       box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
       border: 1px solid rgba(239, 68, 68, 0.4) !important;
       background: linear-gradient(145deg, rgba(30,41,59,0.8) 0%, rgba(127,29,29,0.1) 100%);
     }
+    
+    .warning-highlight {
+      background: linear-gradient(145deg, rgba(30,41,59,0.8) 0%, rgba(217,119,6,0.15) 100%);
+      border: 1px solid rgba(245, 158, 11, 0.5) !important;
+    }
 
-    /* Custom Checkbox */
     .custom-checkbox {
       appearance: none;
       -webkit-appearance: none;
@@ -88,15 +90,18 @@
       font-size: 16px;
       font-weight: 900;
     }
+    
+    .diet-checkbox:checked {
+      background: #8B5CF6;
+      border-color: #8B5CF6;
+    }
 
-    /* Animations */
     .fade-in { animation: fadeIn 0.3s ease-out forwards; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Toast Notification */
     #toast {
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
       transform: translate(-50%, 150px);
@@ -105,25 +110,6 @@
     #toast.show {
       transform: translate(-50%, 0);
       opacity: 1;
-    }
-
-    /* Custom Modal */
-    #confirmModal {
-      backdrop-filter: blur(5px);
-      transition: opacity 0.2s ease;
-      opacity: 0;
-      pointer-events: none;
-    }
-    #confirmModal.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .modal-content {
-      transform: scale(0.95);
-      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    #confirmModal.active .modal-content {
-      transform: scale(1);
     }
   </style>
 </head>
@@ -137,79 +123,190 @@
         <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
           👮‍♂️ PI Prep <span class="text-brand-accent">x</span> Lean Legs
         </h1>
-        <p class="text-[11px] text-brand-textMuted mt-1 font-medium tracking-wide uppercase">Tactical Fitness & Aesthetics</p>
-      </div>
-      <div class="glass-panel px-4 py-2 rounded-2xl flex flex-col items-end">
-        <span class="text-[9px] text-brand-textMuted font-bold uppercase tracking-widest">Workouts</span>
-        <span class="text-2xl font-black text-brand-accent tabular-nums leading-none" id="totalLogsCount">0</span>
-      </div>
-    </header>
-
-    <!-- Daily Habit Tracker -->
-    <div class="glass-panel rounded-2xl p-4 mb-6 flex flex-wrap justify-between items-center gap-3 border border-brand-border/50 bg-slate-800/30">
-      <div class="text-xs font-bold text-slate-200 flex items-center gap-2">
-        <span class="text-lg">🔋</span> Daily Recovery
+        <p class="text-[11px] text-brand-textMuted mt-1 font-medium tracking-wide uppercase">Module-Based Training System</p>
       </div>
       <div class="flex gap-2">
-        <label class="flex items-center gap-2 cursor-pointer bg-slate-900/60 px-3 py-1.5 rounded-xl border border-slate-700/50 hover:bg-slate-800 transition-colors">
-          <input type="checkbox" id="chkCreatine" class="w-4 h-4 rounded text-brand-accent bg-slate-800 border-slate-600 focus:ring-0 focus:ring-offset-0" onchange="saveHabits()">
-          <span class="text-xs font-bold text-slate-300">5g Creatine</span>
-        </label>
-        <label class="flex items-center gap-2 cursor-pointer bg-slate-900/60 px-3 py-1.5 rounded-xl border border-slate-700/50 hover:bg-slate-800 transition-colors">
-          <input type="checkbox" id="chkWater" class="w-4 h-4 rounded text-brand-success bg-slate-800 border-slate-600 focus:ring-0 focus:ring-offset-0" onchange="saveHabits()">
-          <span class="text-xs font-bold text-slate-300">3L+ Water</span>
-        </label>
+        <div class="glass-panel px-3 py-2 rounded-2xl flex flex-col items-end border border-brand-border">
+          <span class="text-[9px] text-brand-textMuted font-bold uppercase tracking-widest">Total</span>
+          <div class="flex items-center gap-1">
+            <span class="text-sm">🔥</span>
+            <span class="text-xl font-black text-brand-accent tabular-nums leading-none" id="totalLogsCount">0</span>
+          </div>
+        </div>
+        <div class="glass-panel px-3 py-2 rounded-2xl flex flex-col items-end border border-brand-cycle/30 relative overflow-hidden">
+          <div class="absolute inset-0 bg-brand-cycle/10 pointer-events-none"></div>
+          <span class="text-[9px] text-brand-cycle font-bold uppercase tracking-widest relative z-10">Phase</span>
+          <div class="flex items-center gap-1 relative z-10">
+            <span class="text-sm">🔄</span>
+            <span class="text-xl font-black text-white tabular-nums leading-none">C<span id="currentCycleCount">1</span></span>
+          </div>
+        </div>
       </div>
-    </div>
+    </header>
 
     <!-- Navigation Tabs -->
     <nav class="flex p-1.5 glass-panel rounded-2xl mb-6">
       <button id="tabPlanBtn" onclick="switchTab('plan')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-brand-accent text-brand-bg shadow-[0_0_20px_rgba(14,165,233,0.3)]">
-        📅 Workout Plan
+        🏋️ Workout
+      </button>
+      <button id="tabDietBtn" onclick="switchTab('diet')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200">
+        🥗 Diet
       </button>
       <button id="tabHistoryBtn" onclick="switchTab('history')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200">
-        📜 History & Logs
+        📜 History
       </button>
     </nav>
 
     <!-- TAB 1: WORKOUT PLAN -->
     <div id="planView" class="fade-in">
       
-      <!-- Horizontal Scrollable Day Selector -->
+      <!-- Day Selector (Session based) -->
       <div class="no-scrollbar flex gap-2 overflow-x-auto pb-2 mb-4 snap-x">
         <div id="daySelector" class="flex gap-2 w-full"></div>
       </div>
 
+      <div class="text-xs text-brand-textMuted mb-4 px-1 flex items-center gap-2 font-medium">
+        <span>💡 進度制：不強求連續每天做。準備好再推展下個 Session。</span>
+      </div>
+
       <!-- Day Info Banner -->
       <div id="dayBanner" class="relative overflow-hidden glass-panel rounded-3xl p-6 mb-6 border-l-4 border-l-brand-accent">
-        <!-- Background Pattern -->
-        <div class="absolute -right-4 -bottom-4 opacity-5 pointer-events-none">
-          <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        </div>
         <!-- Injected via JS -->
       </div>
 
       <!-- Exercise List -->
-      <div id="exerciseList" class="flex flex-col gap-4 mb-8">
+      <div id="exerciseList" class="flex flex-col gap-4 mb-6">
         <!-- Injected via JS -->
       </div>
 
-      <!-- Action Buttons -->
+      <!-- 瘦腿拉筋法則模組 -->
+      <div class="glass-panel rounded-2xl p-5 mb-8 border border-purple-500/30 bg-purple-900/10 relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 text-6xl opacity-10">🦵</div>
+        <h3 class="text-sm font-extrabold text-purple-400 mb-3 flex items-center gap-2">
+          ✨ 必做：瘦腿拉筋協議 (改善肌肉型粗腿)
+        </h3>
+        <ul class="text-[11px] text-slate-300 space-y-3 mb-4 font-medium leading-relaxed">
+          <li class="flex items-start gap-2">
+            <span class="text-brand-exam">🔥</span> 
+            <span><strong>趁熱拉 (時機最重要)：</strong>做完運動/跑完步 15 分鐘內進行，此時充血發熱，肌肉延展性最高。</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-brand-success">⏱</span> 
+            <span><strong>死忍 45-60 秒：</strong>拉到「緊繃微痛」位置靜態停留。拉10秒無效，必須讓神經發出放鬆訊號。</span>
+          </li>
+        </ul>
+        <div class="flex gap-2 border-t border-purple-500/20 pt-4 mt-2">
+          <button onclick="startTimer(45)" class="flex-1 py-2 bg-slate-800 rounded-xl text-[11px] font-bold text-slate-300 active:bg-purple-600 active:text-white border border-slate-700">⏱ 45s 計時</button>
+          <button onclick="startTimer(60)" class="flex-1 py-2 bg-slate-800 rounded-xl text-[11px] font-bold text-slate-300 active:bg-purple-600 active:text-white border border-slate-700">⏱ 60s 計時</button>
+        </div>
+      </div>
+
       <div class="flex flex-col gap-3 mb-8">
         <button onclick="saveTodayRecord()" class="w-full py-4 bg-brand-accent text-brand-bg font-black rounded-2xl text-[15px] shadow-[0_4px_25px_rgba(14,165,233,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-          Save Workout & Progress
-        </button>
-        <button onclick="requestClearForm()" class="w-full py-3.5 glass-panel text-slate-300 font-bold rounded-2xl text-xs active:bg-slate-800 transition-colors">
-          Clear Current Inputs
+          Save Session & Advance
         </button>
       </div>
     </div>
 
-    <!-- TAB 2: HISTORY -->
+    <!-- TAB 2: DIET & NUTRITION (Cycle-based) -->
+    <div id="dietView" class="hidden fade-in mb-8">
+      
+      <!-- Microbiome Info Panel -->
+      <div id="cycleDietBanner" class="relative overflow-hidden glass-panel rounded-3xl p-5 mb-5 border-l-4 border-l-brand-diet">
+        <div class="absolute -right-2 -top-2 text-6xl opacity-10">🦠</div>
+        <div class="flex justify-between items-start mb-2 relative z-10">
+          <h2 class="text-base font-black text-white">腸道微生態輪換矩陣</h2>
+          <span class="text-[10px] font-extrabold px-2 py-1 rounded-lg border bg-brand-diet/20 text-brand-diet border-brand-diet/30 uppercase tracking-widest" id="dietCycleTag">CYCLE 1</span>
+        </div>
+        <p class="text-[11px] text-slate-300 relative z-10 leading-relaxed font-medium mb-3">
+          防止腸道菌相單一化。透過每 7 個訓練日自動更換蔬菜組合，確保益生菌定植及多元植化素抗氧攝取。
+        </p>
+        <div class="bg-slate-900/60 rounded-xl p-3 border border-slate-700/50">
+          <div class="text-[10px] font-bold text-brand-textMuted uppercase mb-1">本週期專屬植化素來源：</div>
+          <div id="dietCycleVegText" class="text-xs font-bold text-brand-success">載入中...</div>
+        </div>
+      </div>
+
+      <!-- Daily Habit Checkbox (Persistent for today) -->
+      <h3 class="text-sm font-extrabold text-white mb-3 mt-6">基礎營養任務 (Daily)</h3>
+      <div class="glass-panel rounded-2xl p-4 mb-5 border border-slate-700/60 flex flex-col gap-3">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" id="dietHabit1" class="custom-checkbox diet-checkbox w-5 h-5 rounded-md" onchange="saveDietHabits()">
+          <span class="text-xs font-bold text-slate-200 flex-1">3L+ 清水 (排走乳酸與肌酸水分)</span>
+        </label>
+        <div class="h-px bg-slate-700/50 w-full"></div>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" id="dietHabit2" class="custom-checkbox diet-checkbox w-5 h-5 rounded-md" onchange="saveDietHabits()">
+          <span class="text-[11px] font-medium text-slate-200 flex-1">
+            <strong class="text-white text-xs block mb-0.5">統一早餐</strong>
+            Cheerios燕麥圈(40g) + 無糖大豆高鈣250ml + 雞蛋2隻 + 奇異果1個
+          </span>
+        </label>
+        <div class="h-px bg-slate-700/50 w-full"></div>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" id="dietHabit3" class="custom-checkbox diet-checkbox w-5 h-5 rounded-md" onchange="saveDietHabits()">
+          <span class="text-[11px] font-medium text-slate-200 flex-1">
+            <strong class="text-white text-xs block mb-0.5">維他命矩陣</strong>
+            早餐後：黑咖啡 + 維 B雜 <br>午餐後：維 C (助三價鐵轉化為二價鐵)
+          </span>
+        </label>
+      </div>
+
+      <!-- Workout Supplements (Hidden on Day 7) -->
+      <div id="workoutSupplementsArea">
+        <h3 class="text-sm font-extrabold text-white mb-3 mt-6 flex items-center gap-2">
+          <span>運動日專屬補給</span>
+          <span class="text-[9px] bg-brand-accent/20 text-brand-accent px-2 py-0.5 rounded border border-brand-accent/30">Day 1-6</span>
+        </h3>
+        <div class="glass-panel rounded-2xl p-4 mb-5 border border-brand-accent/30 bg-brand-accent/5">
+          
+          <div class="mb-4">
+            <div class="text-xs font-bold text-white mb-2 flex items-center gap-1.5"><span class="text-sm">⚡</span> 運動前 45 分鐘</div>
+            <div class="flex gap-2 mb-2">
+              <span class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 font-medium">🍌 香蕉 1 條</span>
+              <span class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 font-medium">🌰 處理過的核桃 3-4 粒</span>
+            </div>
+            <!-- ABSOLUTE WALNUT COMMAND -->
+            <div class="warning-highlight rounded-xl p-3 flex items-start gap-2 mt-2">
+              <span class="text-base mt-0.5">⚠️</span>
+              <div class="text-[10px] text-slate-200 font-medium leading-relaxed">
+                <strong class="text-amber-400 block mb-1">絕對防儲水指令 (Anti-Water Retention):</strong>
+                進食核桃前，必須用食水<strong>快速沖洗掉表面鹽分</strong>，並立刻用廚房紙印乾！過多鈉會直接破壞 Lean Legs 去水腫目標，增加體能考核負擔。
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-brand-accent/20 pt-4">
+            <div class="text-xs font-bold text-white mb-2 flex items-center gap-1.5"><span class="text-sm">💪</span> 運動後即時</div>
+            <div class="flex gap-2">
+              <span class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 font-medium">🥛 蛋白粉 1 殼</span>
+              <span class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 font-medium">🧪 肌酸 5g</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="day7RecoveryArea" class="hidden glass-panel rounded-2xl p-5 mb-5 border border-slate-500/30 bg-slate-800/30 text-center">
+        <span class="text-2xl mb-2 block">🧘‍♂️</span>
+        <h4 class="text-sm font-bold text-white mb-1">Active Recovery (無訓練日)</h4>
+        <p class="text-[11px] text-slate-400 font-medium">今日停用香蕉、核桃、蛋白粉與肌酸，讓受體與肝臟重置。</p>
+      </div>
+
+      <!-- Dynamic Meals for Current Session -->
+      <h3 class="text-sm font-extrabold text-white mb-3 mt-6 flex items-center gap-2">
+        <span id="mealSessionTitle">Session 1</span> 餐單與烹調指令
+      </h3>
+      <div id="mealsContainer" class="flex flex-col gap-4">
+        <!-- Injected via JS based on Session and Cycle -->
+      </div>
+      
+    </div>
+
+    <!-- TAB 3: HISTORY -->
     <div id="historyView" class="hidden fade-in mb-8">
       <div class="flex justify-between items-center mb-5">
-        <h3 class="text-base font-extrabold text-white">Past 30 Days</h3>
+        <h3 class="text-base font-extrabold text-white">History & Progress</h3>
         <div class="flex gap-2">
           <button onclick="exportData()" class="px-3 py-2 text-[10px] font-bold glass-panel rounded-xl text-brand-accent hover:bg-slate-800 transition-colors">📤 Export</button>
           <button onclick="triggerImport()" class="px-3 py-2 text-[10px] font-bold glass-panel rounded-xl text-brand-success hover:bg-slate-800 transition-colors">📥 Import</button>
@@ -223,7 +320,7 @@
 
   </div>
 
-  <!-- Floating Rest Timer (Sticky Bottom) -->
+  <!-- Floating Rest Timer -->
   <div class="fixed bottom-0 left-0 right-0 glass-panel border-t border-brand-border p-4 z-40 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
     <div class="max-w-2xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-4">
@@ -244,251 +341,209 @@
     </div>
   </div>
 
-  <!-- Floating Toast -->
+  <!-- Toast -->
   <div id="toast" class="fixed bottom-28 left-1/2 z-50 bg-brand-success text-brand-bg font-black text-sm px-6 py-3 rounded-full shadow-[0_10px_30px_rgba(16,185,129,0.3)] flex items-center gap-2 pointer-events-none w-max">
     <span class="text-lg">✅</span> <span id="toastMsg">Workout Saved!</span>
   </div>
 
-  <!-- Custom Confirmation Modal (Replaces browser confirm) -->
-  <div id="confirmModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-4">
-    <div class="modal-content bg-brand-panel border border-brand-border rounded-3xl p-6 max-w-sm w-full shadow-2xl">
-      <h3 class="text-lg font-bold text-white mb-2" id="modalTitle">Confirm Action</h3>
-      <p class="text-sm text-brand-textMuted mb-6" id="modalMessage">Are you sure you want to proceed?</p>
-      <div class="flex gap-3">
-        <button onclick="closeModal()" class="flex-1 py-3 bg-slate-800 text-slate-300 rounded-xl font-bold text-sm">Cancel</button>
-        <button id="modalConfirmBtn" class="flex-1 py-3 bg-brand-exam text-white rounded-xl font-bold text-sm shadow-[0_4px_15px_rgba(239,68,68,0.3)]">Confirm</button>
-      </div>
-    </div>
-  </div>
-
   <script>
     /* =========================================================
-       DATA STRUCTURE: English Pro Edition (No Bulky Legs + PI Prep)
+       DATA: Workout Schedule (Sessions 1-7)
        ========================================================= */
-    const workoutSchedule = {
+    const appSchedule = {
       1: {
-        title: "Mon | Upper Body & PI Push-ups",
+        title: "Session 1 | Upper Body & PI Push-ups",
         typeTag: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
         typeName: "🔥 CORE",
         desc: "Push/Pull balance. Builds upper body strength for PI push-ups.",
         warmup: "Face Pull (Cable) 2x15",
         exercises: [
-          {
-            id: "m1", name: "Chest Press Machine",
-            target: "3 x 8-12", rest: "90s", defaultWeight: "", defaultReps: "8-12",
-            note: "Keep chest up, shoulders down. Don't lock elbows.", tags: ['Chest']
-          },
-          {
-            id: "m2", name: "Lat Pull Down",
-            target: "4 x 8-12", rest: "90s", defaultWeight: "", defaultReps: "8-12",
-            note: "Slight lean back, pull bar to collarbone.", tags: ['Back']
-          },
-          {
-            id: "m3", name: "Rear Delt Fly (Machine)",
-            target: "3 x 12-15", rest: "60s", defaultWeight: "", defaultReps: "12-15",
-            note: "Focus on upper back and rear shoulders.", tags: ['Shoulder']
-          },
-          {
-            id: "m4", name: "Bodyweight Push-ups",
-            target: "3 x Max Reps", rest: "90s", defaultWeight: "BW", defaultReps: "Max",
-            note: "PI EXAM: Continuous motion. Creatine helps push 2-3 extra reps here.", tags: ['PI-Exam']
-          },
-          {
-            id: "m5", name: "1-Min Timed Sit-ups",
-            target: "3 x 1 Min", rest: "90s", defaultWeight: "-", defaultReps: "Max",
-            note: "PI EXAM: Explosive speed. Hook feet. Not for slow burn, go for speed.", tags: ['PI-Exam']
-          }
+          { id: "s1-1", name: "Chest Press Machine", target: "3 x 8-12", rest: "90s", defaultWeight: "-", defaultReps: "8-12", note: "Keep chest up, shoulders down.", tags: ['Chest'] },
+          { id: "s1-2", name: "Lat Pull Down", target: "4 x 8-12", rest: "90s", defaultWeight: "-", defaultReps: "8-12", note: "Pull bar to collarbone.", tags: ['Back'] },
+          { id: "s1-3", name: "Rear Delt Fly (Machine)", target: "3 x 12-15", rest: "60s", defaultWeight: "-", defaultReps: "12-15", note: "Focus on upper back and rear shoulders.", tags: ['Shoulder'] },
+          { id: "s1-4", name: "Bodyweight Push-ups", target: "3 x Max", rest: "90s", defaultWeight: "BW", defaultReps: "Max", note: "PI EXAM: Continuous motion. Creatine helps.", tags: ['PI-Exam'] },
+          { id: "s1-5", name: "1-Min Timed Sit-ups", target: "3 x 1 Min", rest: "90s", defaultWeight: "-", defaultReps: "Max", note: "PI EXAM: 維持核心繃緊，下背需緊貼地面。", tags: ['PI-Exam'] }
         ]
       },
       2: {
-        title: "Tue | Leg Endurance & Core",
+        title: "Session 2 | Leg Endurance & Core",
         typeTag: "bg-slate-600/30 text-slate-400 border-slate-600/50",
         typeName: "💤 AUX",
         desc: "Light endurance legs to protect knees. Tactical core finishers.",
-        warmup: "Recumbent Bike 5 mins + 15 BW Squats",
+        warmup: "Recumbent Bike 5 mins",
         exercises: [
-          {
-            id: "t1", name: "Leg Press (High Stance)",
-            target: "3 x 15-20", rest: "60s", defaultWeight: "Light", defaultReps: "15-20",
-            note: "ENDURANCE: Place feet high on platform. Prevents bulky quads, targets glutes.", tags: ['Lean-Legs']
-          },
-          {
-            id: "t2", name: "Inner / Outer Thigh Machine",
-            target: "3 x 15", rest: "60s", defaultWeight: "", defaultReps: "15",
-            note: "Stabilizes hips for running. Prevents knee valgus.", tags: ['Knee-Health']
-          },
-          {
-            id: "t3", name: "Plank Support",
-            target: "3 x 45-60s", rest: "45s", defaultWeight: "BW", defaultReps: "60s",
-            note: "Tactical core: Anti-rotation. Keeps pelvis stable while running.", tags: ['Tactical']
-          },
-          {
-            id: "t4", name: "Finisher: Tactical Tabata",
-            target: "4 Mins", rest: "10s", defaultWeight: "BW", defaultReps: "4 Mins",
-            note: "20s Jumping Jacks / Mountain Climbers. 10s rest. Repeat 4x.", tags: ['Tactical', 'Agility']
-          }
+          { id: "s2-1", name: "Leg Press (High Stance)", target: "3 x 15-20", rest: "60s", defaultWeight: "Light", defaultReps: "15-20", note: "ENDURANCE: High feet placement prevents bulky quads.", tags: ['Lean-Legs'] },
+          { id: "s2-2", name: "Inner/Outer Thigh Machine", target: "3 x 15", rest: "60s", defaultWeight: "-", defaultReps: "15", note: "Stabilizes hips for running.", tags: ['Knee-Health'] },
+          { id: "s2-3", name: "Plank Support", target: "3 x 45-60s", rest: "45s", defaultWeight: "BW", defaultReps: "60s", note: "Tactical core: Anti-rotation.", tags: ['Tactical'] },
+          { id: "s2-4", name: "Tactical Tabata", target: "4 Mins", rest: "10s", defaultWeight: "BW", defaultReps: "4 Mins", note: "20s Work / 10s Rest. Jumping Jacks or Climbers.", tags: ['Tactical'] }
         ]
       },
       3: {
-        title: "Wed | Swimming HIIT",
+        title: "Session 3 | Swimming HIIT",
         typeTag: "bg-purple-500/20 text-purple-400 border-purple-500/30",
         typeName: "🔥 CORE",
-        desc: "Max heart rate without joint impact. Boosts VO2 Max for the 800m run.",
+        desc: "Max heart rate without joint impact. Boosts VO2 Max for 800m.",
         warmup: "150m Slow Swim",
         exercises: [
-          {
-            id: "w1", name: "50m Freestyle Sprint (HIIT)",
-            target: "6-8 Sets", rest: "45s", defaultWeight: "-", defaultReps: "6-8 Sets",
-            note: "90% Max effort. Creatine will power your fast-twitch muscle fibers here.", tags: ['VO2-Max', 'Fat-Burn']
-          },
-          {
-            id: "w2", name: "Backstroke Cool-down",
-            target: "100m", rest: "Easy", defaultWeight: "-", defaultReps: "100m",
-            note: "Open up the chest and relax the shoulders.", tags: ['Recovery']
-          }
+          { id: "s3-1", name: "50m Freestyle Sprint (HIIT)", target: "6-8 Sets", rest: "45s", defaultWeight: "-", defaultReps: "6-8", note: "90% Max effort.", tags: ['VO2-Max'] },
+          { id: "s3-2", name: "Backstroke Cool-down", target: "100m", rest: "Easy", defaultWeight: "-", defaultReps: "100m", note: "Open up chest and relax shoulders.", tags: ['Recovery'] }
         ]
       },
       4: {
-        title: "Thu | Upper Sculpt & PI Push-ups",
+        title: "Session 4 | Upper Sculpt & PI Push-ups",
         typeTag: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
         typeName: "🔥 CORE",
-        desc: "Secondary upper body day. Sculpting shoulders and re-testing push-ups.",
+        desc: "Secondary upper body. Sculpting shoulders & re-testing push-ups.",
         warmup: "Dumbbell Y-Raise (Light)",
         exercises: [
-          {
-            id: "th1", name: "Incline DB Press",
-            target: "3 x 8-12", rest: "90s", defaultWeight: "", defaultReps: "8-12",
-            note: "Bench at 30 degrees. Focus on upper chest.", tags: ['Chest']
-          },
-          {
-            id: "th2", name: "Seated Cable Row",
-            target: "4 x 10-12", rest: "75s", defaultWeight: "", defaultReps: "10-12",
-            note: "Squeeze shoulder blades together at the back.", tags: ['Back']
-          },
-          {
-            id: "th3", name: "Lateral Raise (DB)",
-            target: "4 x 15", rest: "60s", defaultWeight: "", defaultReps: "15",
-            note: "Slight bend in elbow. Builds V-Taper aesthetics.", tags: ['Shoulder']
-          },
-          {
-            id: "th4", name: "Bodyweight Push-ups",
-            target: "3 x Max Reps", rest: "90s", defaultWeight: "BW", defaultReps: "Max",
-            note: "PI EXAM: Try to beat Monday's score.", tags: ['PI-Exam']
-          },
-          {
-            id: "th5", name: "1-Min Timed Sit-ups",
-            target: "3 x 1 Min", rest: "90s", defaultWeight: "-", defaultReps: "Max",
-            note: "PI EXAM: Max speed. Keep core braced.", tags: ['PI-Exam']
-          }
+          { id: "s4-1", name: "Incline DB Press", target: "3 x 8-12", rest: "90s", defaultWeight: "-", defaultReps: "8-12", note: "Bench at 30 degrees. Focus on upper chest.", tags: ['Chest'] },
+          { id: "s4-2", name: "Seated Cable Row", target: "4 x 10-12", rest: "75s", defaultWeight: "-", defaultReps: "10-12", note: "Squeeze shoulder blades.", tags: ['Back'] },
+          { id: "s4-3", name: "Lateral Raise (DB)", target: "4 x 15", rest: "60s", defaultWeight: "-", defaultReps: "15", note: "Builds V-Taper aesthetics.", tags: ['Shoulder'] },
+          { id: "s4-4", name: "Bodyweight Push-ups", target: "3 x Max", rest: "90s", defaultWeight: "BW", defaultReps: "Max", note: "PI EXAM: Try to beat Session 1's score.", tags: ['PI-Exam'] },
+          { id: "s4-5", name: "1-Min Timed Sit-ups", target: "3 x 1 Min", rest: "90s", defaultWeight: "-", defaultReps: "Max", note: "PI EXAM: Max speed.", tags: ['PI-Exam'] }
         ]
       },
       5: {
-        title: "Fri | PI Agility & Posterior Chain",
+        title: "Session 5 | PI Agility & Posterior Chain",
         typeTag: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
         typeName: "🔥 CORE",
         desc: "The Ultimate Leg Day. 100% no bulky quads. Builds sprint engine.",
-        warmup: "4x10m Shuttle Sprint Drill (Empty Space)",
+        warmup: "4x10m Shuttle Sprint Drill",
         exercises: [
-          {
-            id: "f0", name: "4x10m Shuttle Drill",
-            target: "3 Sets", rest: "2 Mins", defaultWeight: "BW", defaultReps: "3 Sets",
-            note: "PI EXAM: Practice acceleration, low center of gravity turning, and touching ground.", tags: ['PI-Exam', 'Agility']
-          },
-          {
-            id: "f1", name: "Dumbbell RDL (Romanian Deadlift)",
-            target: "3 x 10-12", rest: "90s", defaultWeight: "", defaultReps: "10-12",
-            note: "Push hips back. Strong stretch in hamstrings. Key for running speed.", tags: ['Lean-Legs']
-          },
-          {
-            id: "f2", name: "Leg Press (High Stance)",
-            target: "3 x 15", rest: "90s", defaultWeight: "", defaultReps: "15",
-            note: "Feet high. Pushes power from glutes, avoiding quad growth.", tags: ['Lean-Legs']
-          },
-          {
-            id: "f3", name: "Kettlebell Swing",
-            target: "3 x 15-20", rest: "60s", defaultWeight: "", defaultReps: "15-20",
-            note: "Explosive hip hinge. Perfect translation to sprinting power.", tags: ['Explosive']
-          },
-          {
-            id: "f4", name: "Leg Curl Machine",
-            target: "3 x 12", rest: "60s", defaultWeight: "", defaultReps: "12",
-            note: "Isolate hamstrings. Slow eccentric (lowering) phase.", tags: ['Knee-Health']
-          }
+          { id: "s5-0", name: "4x10m Shuttle Drill", target: "3 Sets", rest: "120s", defaultWeight: "BW", defaultReps: "3 Sets", note: "PI EXAM: Practice low center of gravity turning.", tags: ['PI-Exam'] },
+          { id: "s5-1", name: "Dumbbell RDL", target: "3 x 10-12", rest: "90s", defaultWeight: "-", defaultReps: "10-12", note: "Push hips back. Key for running speed.", tags: ['Lean-Legs'] },
+          { id: "s5-2", name: "Leg Press (High Stance)", target: "3 x 15", rest: "90s", defaultWeight: "-", defaultReps: "15", note: "Feet high. Pushes power from glutes.", tags: ['Lean-Legs'] },
+          { id: "s5-3", name: "Kettlebell Swing", target: "3 x 15-20", rest: "60s", defaultWeight: "-", defaultReps: "15-20", note: "Explosive hip hinge.", tags: ['Explosive'] },
+          { id: "s5-4", name: "Leg Curl Machine", target: "3 x 12", rest: "60s", defaultWeight: "-", defaultReps: "12", note: "Isolate hamstrings.", tags: ['Knee-Health'] }
         ]
       },
       6: {
-        title: "Sat | PI 800m Run / Intervals",
+        title: "Session 6 | PI 800m Run / Intervals",
         typeTag: "bg-rose-500/20 text-rose-400 border-rose-500/30",
         typeName: "🔥 CORE",
-        desc: "Outdoor running day. Translating gym strength into track performance.",
+        desc: "Outdoor running. Translating gym strength into track performance.",
         warmup: "Dynamic Stretches & High Knees",
         exercises: [
-          {
-            id: "s1", name: "Run-Walk Method (Adaptation)",
-            target: "20-25 Mins", rest: "Continuous", defaultWeight: "-", defaultReps: "25 Mins",
-            note: "For first 2 weeks: Jog 2 mins, Walk 1 min. Land on mid-foot to protect knees.", tags: ['Knee-Health']
-          },
-          {
-            id: "s2", name: "Track Intervals (400m x 4)",
-            target: "4 Sets", rest: "60-90s", defaultWeight: "-", defaultReps: "4 Sets",
-            note: "PI EXAM: After adapting, switch to this. Simulates lactic acid build-up in 800m.", tags: ['PI-Exam']
-          }
+          { id: "s6-1", name: "Run-Walk / 800m Pace", target: "20-25 Mins", rest: "Cont.", defaultWeight: "-", defaultReps: "25 Mins", note: "Adaptation: Jog 2m, Walk 1m. Land mid-foot.", tags: ['Knee-Health'] },
+          { id: "s6-2", name: "Track Intervals (400m x 4)", target: "4 Sets", rest: "90s", defaultWeight: "-", defaultReps: "4 Sets", note: "PI EXAM: Simulates lactic acid build-up.", tags: ['PI-Exam'] }
         ]
       },
       7: {
-        title: "Sun | Stretch & Recovery",
+        title: "Session 7 | Active Recovery",
         typeTag: "bg-slate-600/30 text-slate-400 border-slate-600/50",
         typeName: "💤 AUX",
-        desc: "Flush lactic acid, clear creatine water retention in calves.",
+        desc: "Flush lactic acid, clear creatine water retention.",
         warmup: "Deep Breathing",
         exercises: [
-          {
-            id: "su1", name: "Lower Body Deep Stretch",
-            target: "15-20 Mins", rest: "Hold", defaultWeight: "-", defaultReps: "Done",
-            note: "Focus heavily on stretching calves and hamstrings after running & creatine.", tags: ['Recovery']
-          },
-          {
-            id: "su2", name: "Nutrition & Sleep",
-            target: "8 Hours", rest: "-", defaultWeight: "-", defaultReps: "Done",
-            note: "Whey protein POST-workout (not during). Maintain high water intake.", tags: ['Recovery']
-          }
+          { id: "s7-1", name: "Foam Rolling", target: "15 Mins", rest: "-", defaultWeight: "-", defaultReps: "Done", note: "Focus heavily on calves and IT band.", tags: ['Recovery'] },
+          { id: "s7-2", name: "Mental & Nutrition Prep", target: "8 Hrs Sleep", rest: "-", defaultWeight: "-", defaultReps: "Done", note: "Hydrate well today.", tags: ['Recovery'] }
         ]
       }
     };
 
-    let currentDay = 1;
-    let currentLogs = JSON.parse(localStorage.getItem('pi_workout_logs_v2') || '[]');
-    let dailyHabits = JSON.parse(localStorage.getItem('pi_daily_habits_v2') || '{}');
+    /* =========================================================
+       DATA: Microbiome Rotation Matrix (Diet)
+       ========================================================= */
+    const cycleData = {
+      1: {
+        name: "CYCLE 1 (經典基礎)",
+        desc: "番茄 (茄紅素) + 西蘭花 (十字花科防癌) + 紅蘿蔔 (β-胡蘿蔔素) + 菠菜 (鐵質)。建立穩定的消化基礎。",
+        veg: { v1: "番茄", v2: "西蘭花", v3: "紅蘿蔔", v4: "菠菜" }
+      },
+      2: {
+        name: "CYCLE 2 (益生元強化)",
+        desc: "洋蔥 (菊糖) + 蘆筍 (低聚果糖) + 三色椒 (維他命C) + 鮮冬菇 (多醣體)。專攻腸道好菌定植，極速擴大菌相多樣性。",
+        veg: { v1: "洋蔥", v2: "蘆筍", v3: "三色椒", v4: "鮮冬菇" }
+      },
+      3: {
+        name: "CYCLE 3 (高纖植化素)",
+        desc: "南瓜粒 (優質複合碳水) + 紫椰菜 (花青素抗炎) + 翠玉瓜 (高鉀去水腫) + 小棠菜 (鈣質)。強大抗氧化，深層修復肌肉發炎。",
+        veg: { v1: "南瓜粒", v2: "紫椰菜", v3: "翠玉瓜", v4: "小棠菜" }
+      }
+    };
+
+    // Meal Blueprints based on Session (1-7)
+    const mealBlueprints = {
+      1: { 
+        lunch: { meat: "特瘦免治牛肉 150g", carb: "白飯 1 碗", veg: ["[v1]", "[v2]"], method: "電飯煲底層洗米放水放[v1]，飯熟前 5 分鐘鋪[v2]。平底鑊「不落油」乾炒牛肉，灑海鹽黑椒，逼出的牛油汁徹底倒掉，拌勻。" },
+        dinner: { meat: "急凍泰國無骨雞胸 150g", carb: "白飯 1 碗", veg: ["[v3]", "[v4]"], method: "電飯煲洗米放水，將醃好的雞肉與[v3]直接鋪水面按煮飯。飯熟前 5 分鐘鋪[v4]焗熟。" }
+      },
+      2: {
+        lunch: { meat: "急凍泰國無骨雞胸 150g", carb: "白飯 1 碗", veg: ["[v1]", "[v3]"], method: "電飯煲一鍋熟。米、水、[v1]、[v3]、醃好的雞胸全部放入同煮。" },
+        dinner: { meat: "急凍三文魚柳 150g", carb: "白飯半碗", veg: ["[v2]"], method: "電飯煲煮飯，最後 5 分鐘鋪[v2]。三文魚印乾抹海鹽黑椒，平底鑊無油皮朝下先煎逼出魚油，再反面煎熟。" }
+      },
+      3: {
+        lunch: { meat: "特瘦免治牛肉 150g", carb: "白飯 1 碗", veg: ["[v4]"], method: "電飯煲煮飯，最後 5 分鐘鋪[v4]。平底鑊乾炒牛肉去肥油，加海鹽黑椒拌入飯。" },
+        dinner: { meat: "虎蝦肉 150g (極致心肺修復)", carb: "白飯半碗", veg: ["[v3]", "[v2]"], method: "電飯煲洗米放[v3]同煮。最後 5 分鐘，將拌少許鹽黑椒的蝦肉與[v2]鋪面焗熟。蝦鮮甜汁液滲入飯中。" }
+      },
+      4: {
+        lunch: { meat: "特瘦免治牛肉 150g", carb: "白飯 1 碗", veg: ["[v1]", "[v2]"], method: "電飯煲煮飯與[v1]，最後 5 分鐘鋪[v2]。牛肉乾炒去油拌入。" },
+        dinner: { meat: "急凍泰國無骨雞胸 150g", carb: "白飯 1 碗", veg: ["[v4]"], method: "醃好雞胸與飯一鍋熟，最後 5 分鐘鋪[v4]。" }
+      },
+      5: {
+        lunch: { meat: "急凍泰國無骨雞胸 150g", carb: "白飯 1 碗", veg: ["[v1]", "[v3]"], method: "電飯煲一鍋熟（米、[v1]、[v3]、雞肉）。進食次序：先菜後肉再飯，穩定血糖。" },
+        dinner: { meat: "急凍三文魚柳 150g (抗壓荷爾蒙)", carb: "白飯半碗", veg: ["[v4]"], method: "飯與[v4]電飯煲處理（菜最後5分落）。三文魚無油乾煎，用鍋中魚油拌[v4]吃。" }
+      },
+      6: {
+        lunch: { meat: "特瘦免治牛肉 150g", carb: "白飯 1 碗", veg: ["[v3]", "[v2]"], method: "飯與[v3]同煮，最後5分鐘鋪[v2]。牛肉乾炒去油。最強鐵質應付田徑。" },
+        dinner: { meat: "虎蝦肉 150g (神經修復)", carb: "白飯半碗", veg: ["[v1]", "[v4]"], method: "飯與[v1]同煮，最後 5 分鐘鋪入調味蝦肉與[v4]焗熟。" }
+      },
+      7: {
+        lunch: { meat: "急凍泰國無骨雞胸 150g (輕量排毒)", carb: "白飯半碗", veg: ["[v1]", "[v2]"], method: "飯、[v1]、雞肉一鍋熟，[v2]最後 5 分鐘落。" },
+        dinner: { meat: "急凍三文魚柳 150g (好脂肪重置)", carb: "白飯半碗", veg: ["[v3]", "[v4]"], method: "飯與[v3]同煮，[v4]最後5分鐘落。三文魚無油乾煎。早點休息。" }
+      }
+    };
+
+    /* =========================================================
+       APP STATE & LOGIC
+       ========================================================= */
+    let currentLogs = JSON.parse(localStorage.getItem('pi_workout_logs_v3') || '[]');
+    let currentSession = 1;
+    let activeCycle = 1;
     let timerInterval = null;
     let remainingSeconds = 0;
-    let modalCallback = null;
+
+    function calculateProgress() {
+      const totalCompleted = currentLogs.length;
+      activeCycle = Math.floor(totalCompleted / 7) % 3 + 1; // 1, 2, 3 loop
+      currentSession = (totalCompleted % 7) + 1; // 1 to 7
+    }
 
     function initApp() {
-      // Auto-select today
-      const jsDay = new Date().getDay();
-      currentDay = jsDay === 0 ? 7 : jsDay;
-      
-      renderDaySelector();
-      selectDay(currentDay);
+      calculateProgress();
       updateTotalStats();
-      loadHabits();
+      renderDaySelector();
+      selectDay(currentSession);
+      loadDietHabits();
     }
 
     function switchTab(tab) {
       const planView = document.getElementById('planView');
+      const dietView = document.getElementById('dietView');
       const historyView = document.getElementById('historyView');
+      
       const tabPlanBtn = document.getElementById('tabPlanBtn');
+      const tabDietBtn = document.getElementById('tabDietBtn');
       const tabHistoryBtn = document.getElementById('tabHistoryBtn');
+
+      // Reset tabs
+      planView.classList.add('hidden');
+      dietView.classList.add('hidden');
+      historyView.classList.add('hidden');
+      
+      tabPlanBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200 bg-transparent";
+      tabDietBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200 bg-transparent";
+      tabHistoryBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200 bg-transparent";
 
       if (tab === 'plan') {
         planView.classList.remove('hidden');
-        historyView.classList.add('hidden');
         tabPlanBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-brand-accent text-brand-bg shadow-[0_0_20px_rgba(14,165,233,0.3)]";
-        tabHistoryBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200 bg-transparent";
+      } else if (tab === 'diet') {
+        dietView.classList.remove('hidden');
+        tabDietBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-brand-diet text-white shadow-[0_0_20px_rgba(139,92,246,0.3)]";
+        renderDietPlan(currentSession, activeCycle);
       } else {
-        planView.classList.add('hidden');
         historyView.classList.remove('hidden');
-        tabPlanBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200 bg-transparent";
         tabHistoryBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-brand-accent text-brand-bg shadow-[0_0_20px_rgba(14,165,233,0.3)]";
         renderHistoryLogs();
       }
@@ -496,19 +551,18 @@
 
     function renderDaySelector() {
       const container = document.getElementById('daySelector');
-      const daysInfo = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-      
       let html = '';
       for (let i = 1; i <= 7; i++) {
-        const isCore = [1, 3, 4, 5, 6].includes(i); // Core Days
-        const isToday = i === currentDay;
+        const isCore = [1, 3, 4, 5, 6].includes(i);
+        const isSelected = i === currentSession;
+        const isLocked = i > currentSession; // Simple visual cue
         
         html += `
           <div onclick="selectDay(${i})" id="pill-${i}" 
-               class="min-w-[64px] flex-1 py-2.5 px-1 rounded-2xl border border-brand-border cursor-pointer transition-all flex flex-col items-center justify-center relative
-               ${isToday ? 'border-brand-success bg-brand-success/10' : 'glass-panel hover:bg-slate-800/50'}">
-            ${isToday ? `<div class="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-brand-success"></div>` : ''}
-            <span class="text-xs font-bold text-slate-300 name-span mb-0.5">${daysInfo[i-1]}</span>
+               class="min-w-[70px] flex-1 py-2.5 px-1 rounded-2xl border border-brand-border transition-all flex flex-col items-center justify-center relative
+               ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+               ${isSelected ? 'border-brand-success bg-brand-success/10' : 'glass-panel hover:bg-slate-800/50'}">
+            <span class="text-xs font-bold text-slate-300 name-span mb-0.5">Sess ${i}</span>
             ${isCore ? `<span class="text-[9px] text-brand-accent font-extrabold tracking-wide uppercase">Core</span>` : `<span class="text-[9px] text-slate-500 font-bold uppercase tracking-wide">Aux</span>`}
           </div>
         `;
@@ -516,16 +570,15 @@
       container.innerHTML = html;
     }
 
-    function selectDay(dayNum) {
-      currentDay = dayNum;
-      
-      // Update UI Pills visually
+    function selectDay(sessNum) {
+      // Allow reviewing past sessions, but maybe not future if we want strictly progressive
+      // For flexibility, let's allow clicking any session but currentSession var stays tracked
       for (let i = 1; i <= 7; i++) {
         const pill = document.getElementById(`pill-${i}`);
         if(pill) {
-          if (i === dayNum) {
+          if (i === sessNum) {
             pill.classList.add('bg-brand-accent', 'border-brand-accent');
-            pill.classList.remove('glass-panel', 'bg-brand-success/10', 'hover:bg-slate-800/50');
+            pill.classList.remove('glass-panel', 'bg-brand-success/10', 'hover:bg-slate-800/50', 'opacity-50');
             pill.querySelector('.name-span').classList.replace('text-slate-300', 'text-brand-bg');
             pill.querySelector('span:last-child').classList.replace('text-brand-accent', 'text-brand-bg');
             pill.querySelector('span:last-child').classList.replace('text-slate-500', 'text-brand-bg/70');
@@ -533,93 +586,77 @@
           } else {
             pill.classList.remove('bg-brand-accent', 'border-brand-accent');
             pill.classList.add('glass-panel');
+            if(i > currentSession) pill.classList.add('opacity-50');
             pill.querySelector('.name-span').classList.replace('text-brand-bg', 'text-slate-300');
             pill.querySelector('span:last-child').classList.replace('text-brand-bg', 'text-brand-accent');
             pill.querySelector('span:last-child').classList.replace('text-brand-bg/70', 'text-slate-500');
             pill.style.boxShadow = "none";
-            
-            // Re-apply today styling indicator
-            const jsDay = new Date().getDay();
-            const mappedDay = jsDay === 0 ? 7 : jsDay;
-            if(i === mappedDay) pill.classList.add('border-brand-success', 'bg-brand-success/10');
           }
         }
       }
 
-      renderDayPlan(dayNum);
-      document.getElementById(`pill-${dayNum}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      renderWorkoutPlan(sessNum);
+      renderDietPlan(sessNum, activeCycle); // Sync Diet Tab
+      document.getElementById(`pill-${sessNum}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
 
-    function renderDayPlan(dayNum) {
-      const dayData = workoutSchedule[dayNum];
-      const bannerEl = document.getElementById('dayBanner');
-      const listEl = document.getElementById('exerciseList');
-
-      // Render Banner
-      bannerEl.innerHTML = `
+    function renderWorkoutPlan(sessNum) {
+      const dayData = appSchedule[sessNum];
+      document.getElementById('dayBanner').innerHTML = `
+        <div class="absolute -right-4 -bottom-4 opacity-5 pointer-events-none">
+          <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
         <div class="flex justify-between items-start mb-3 relative z-10">
           <h2 class="text-lg font-black text-white max-w-[70%] leading-tight">${dayData.title}</h2>
           <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-lg border ${dayData.typeTag}">${dayData.typeName}</span>
         </div>
         <p class="text-[13px] text-slate-300 mb-4 relative z-10 leading-relaxed font-medium">${dayData.desc}</p>
-        <div class="text-xs font-bold text-brand-accent bg-slate-900/50 px-3.5 py-2.5 rounded-xl border border-brand-accent/20 relative z-10 inline-flex items-center gap-2">
+        <div class="text-xs font-bold text-brand-accent bg-slate-900/50 px-3.5 py-2.5 rounded-xl border border-brand-accent/20 inline-flex items-center gap-2">
           <span class="text-base">⚡</span> Warmup: ${dayData.warmup}
         </div>
       `;
 
-      // Render Exercises
-      listEl.innerHTML = dayData.exercises.map(ex => {
-        const isExamFocus = ex.tags && ex.tags.includes('PI-Exam');
-        const cardClass = isExamFocus ? "exam-highlight" : "border-brand-border/60";
-        
-        let tagHtml = '';
-        if(ex.tags) {
-          tagHtml = ex.tags.map(t => {
-            if(t === 'PI-Exam') return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-brand-exam text-white uppercase tracking-wide">PI EXAM</span>`;
-            return `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-700 text-slate-300 uppercase tracking-wide">${t}</span>`;
-          }).join('');
+      document.getElementById('exerciseList').innerHTML = dayData.exercises.map(ex => {
+        const isExam = ex.tags && ex.tags.includes('PI-Exam');
+        const cardClass = isExam ? "exam-highlight" : "border-brand-border/60";
+        const tags = ex.tags ? ex.tags.map(t => `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${t==='PI-Exam'?'bg-brand-exam text-white':'bg-slate-700 text-slate-300'} uppercase tracking-wide">${t}</span>`).join('') : '';
+
+        // Past data auto-fill
+        let histWeight = ex.defaultWeight;
+        let histReps = ex.defaultReps;
+        for (let log of currentLogs) {
+           const pastRecord = log.items.find(i => i.name === ex.name);
+           if (pastRecord && pastRecord.weight && pastRecord.weight !== "-") {
+              histWeight = pastRecord.weight; histReps = pastRecord.reps; break;
+           }
         }
 
         return `
         <div class="glass-panel rounded-2xl p-4 transition-all duration-300 border ${cardClass}" id="card-${ex.id}">
           <div class="flex items-start gap-3">
-            <input type="checkbox" class="custom-checkbox mt-0.5" id="chk-${ex.id}" onchange="toggleCheck('${ex.id}', ${isExamFocus})">
+            <input type="checkbox" class="custom-checkbox mt-0.5" id="chk-${ex.id}" onchange="toggleCheck('${ex.id}', ${isExam}, '${ex.rest}')">
             <div class="flex-1">
               <div class="flex justify-between items-start gap-2">
                 <div class="text-[15px] font-extrabold text-white leading-tight" id="title-${ex.id}">${ex.name}</div>
-                <div class="flex gap-1 flex-wrap justify-end shrink-0">${tagHtml}</div>
+                <div class="flex gap-1 flex-wrap justify-end shrink-0">${tags}</div>
               </div>
-              
               <div class="flex gap-2 mt-2.5 mb-3">
                 <span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-brand-accent">🎯 ${ex.target}</span>
                 <span class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-400">⏱️ ${ex.rest}</span>
               </div>
-              
-              <div class="text-[11px] font-medium text-brand-textMuted leading-relaxed bg-slate-900/40 p-2.5 rounded-xl border border-slate-700/50">
-                💡 ${ex.note}
-              </div>
+              <div class="text-[11px] font-medium text-brand-textMuted bg-slate-900/40 p-2.5 rounded-xl border border-slate-700/50">💡 ${ex.note}</div>
             </div>
           </div>
-          
           <div class="grid grid-cols-12 gap-3 mt-4 pt-4 border-t border-slate-700/50">
-            <div class="col-span-4 flex flex-col gap-1.5">
-              <label class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Weight</label>
-              <input type="text" id="wt-${ex.id}" placeholder="${ex.defaultWeight}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-brand-accent transition-colors">
-            </div>
-            <div class="col-span-4 flex flex-col gap-1.5">
-              <label class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Reps</label>
-              <input type="text" id="rep-${ex.id}" placeholder="${ex.defaultReps}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-brand-accent transition-colors">
-            </div>
-            <div class="col-span-4 flex flex-col gap-1.5">
-              <label class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Notes</label>
-              <input type="text" id="nt-${ex.id}" placeholder="e.g. Hard" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-brand-accent transition-colors">
-            </div>
+            <div class="col-span-4 flex flex-col gap-1.5"><label class="text-[9px] font-bold text-slate-500 uppercase">Weight</label><input type="text" id="wt-${ex.id}" placeholder="${histWeight !== ex.defaultWeight ? `Last: ${histWeight}` : ex.defaultWeight}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-brand-accent focus:outline-none focus:border-brand-accent"></div>
+            <div class="col-span-4 flex flex-col gap-1.5"><label class="text-[9px] font-bold text-slate-500 uppercase">Reps</label><input type="text" id="rep-${ex.id}" placeholder="${histReps !== ex.defaultReps ? `Last: ${histReps}` : ex.defaultReps}" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-brand-accent"></div>
+            <div class="col-span-4 flex flex-col gap-1.5"><label class="text-[9px] font-bold text-slate-500 uppercase">Notes</label><input type="text" id="nt-${ex.id}" placeholder="e.g. Hard" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white focus:outline-none focus:border-brand-accent"></div>
           </div>
         </div>
       `}).join('');
     }
 
-    function toggleCheck(id, isExamFocus) {
+    function toggleCheck(id, isExam, restStr) {
       const chk = document.getElementById(`chk-${id}`);
       const card = document.getElementById(`card-${id}`);
       const title = document.getElementById(`title-${id}`);
@@ -629,51 +666,118 @@
         card.classList.remove('exam-highlight', 'border-brand-border/60');
         title.classList.add('line-through', 'text-brand-textMuted');
         title.classList.remove('text-white');
+        const match = restStr.match(/(\d+)/);
+        if (match) startTimer(parseInt(match[1]));
       } else {
         card.classList.remove('bg-brand-success/10', 'border-brand-success/40');
         title.classList.remove('line-through', 'text-brand-textMuted');
         title.classList.add('text-white');
-        
-        if(isExamFocus) {
-           card.classList.add('exam-highlight');
-        } else {
-           card.classList.add('border-brand-border/60');
-        }
+        stopTimer();
+        card.classList.add(isExam ? 'exam-highlight' : 'border-brand-border/60');
       }
     }
 
-    function saveTodayRecord() {
-      const dayData = workoutSchedule[currentDay];
-      const now = new Date();
-      const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-      const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    function renderDietPlan(sessNum, cycle) {
+      document.getElementById('dietCycleTag').innerText = `CYCLE ${cycle}`;
+      document.getElementById('dietCycleVegText').innerText = cycleData[cycle].desc;
+      
+      const supArea = document.getElementById('workoutSupplementsArea');
+      const recArea = document.getElementById('day7RecoveryArea');
+      
+      if (sessNum === 7) {
+        supArea.classList.add('hidden');
+        recArea.classList.remove('hidden');
+      } else {
+        supArea.classList.remove('hidden');
+        recArea.classList.add('hidden');
+      }
 
-      const itemsRecorded = [];
+      document.getElementById('mealSessionTitle').innerText = `Session ${sessNum}`;
+      
+      const vMap = cycleData[cycle].veg;
+      const blueprint = mealBlueprints[sessNum];
+
+      const renderMealCard = (type, data) => {
+        let finalVegStr = data.veg.map(v => {
+          if(v === "[v1]") return `<span class="text-brand-diet font-bold">${vMap.v1}</span>`;
+          if(v === "[v2]") return `<span class="text-brand-diet font-bold">${vMap.v2}</span>`;
+          if(v === "[v3]") return `<span class="text-brand-diet font-bold">${vMap.v3}</span>`;
+          if(v === "[v4]") return `<span class="text-brand-diet font-bold">${vMap.v4}</span>`;
+          return v;
+        }).join(" + ");
+
+        let finalMethod = data.method
+          .replace(/\[v1\]/g, vMap.v1).replace(/\[v2\]/g, vMap.v2)
+          .replace(/\[v3\]/g, vMap.v3).replace(/\[v4\]/g, vMap.v4);
+
+        return `
+          <div class="glass-panel rounded-2xl p-4 border border-slate-700/60 relative overflow-hidden">
+            <div class="absolute right-0 top-0 bottom-0 w-1 bg-brand-diet/50"></div>
+            <div class="flex items-center gap-2 mb-3 border-b border-slate-700/50 pb-2">
+              <span class="text-lg">${type === 'Lunch' ? '☀️' : '🌙'}</span>
+              <h4 class="text-sm font-black text-white tracking-wide uppercase">${type}</h4>
+            </div>
+            <div class="flex flex-col gap-1.5 mb-3">
+              <div class="text-[13px] text-slate-200">🥩 肉類： <span class="font-bold text-white">${data.meat}</span></div>
+              <div class="text-[13px] text-slate-200">🍚 碳水： <span class="font-bold text-white">${data.carb}</span></div>
+              <div class="text-[13px] text-slate-200">🥦 蔬菜： ${finalVegStr}</div>
+            </div>
+            <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700 text-[11px] text-brand-textMuted leading-relaxed">
+              <strong class="text-slate-300 block mb-1">🔥 唯一煮法：</strong>
+              ${finalMethod}
+            </div>
+          </div>
+        `;
+      };
+
+      document.getElementById('mealsContainer').innerHTML = 
+        renderMealCard('Lunch', blueprint.lunch) + 
+        renderMealCard('Dinner', blueprint.dinner);
+    }
+
+    function loadDietHabits() {
+      const today = new Date().toISOString().split('T')[0];
+      let stored = JSON.parse(localStorage.getItem('pi_diet_habits_v1') || '{}');
+      if (stored.date !== today) stored = { date: today, h1: false, h2: false, h3: false };
+      document.getElementById('dietHabit1').checked = stored.h1;
+      document.getElementById('dietHabit2').checked = stored.h2;
+      document.getElementById('dietHabit3').checked = stored.h3;
+    }
+    
+    function saveDietHabits() {
+      localStorage.setItem('pi_diet_habits_v1', JSON.stringify({
+        date: new Date().toISOString().split('T')[0],
+        h1: document.getElementById('dietHabit1').checked,
+        h2: document.getElementById('dietHabit2').checked,
+        h3: document.getElementById('dietHabit3').checked
+      }));
+    }
+
+    function saveTodayRecord() {
+      const dayData = appSchedule[currentSession];
+      const now = new Date();
       let completedCount = 0;
+      let itemsRecorded = [];
 
       dayData.exercises.forEach(ex => {
         const isDone = document.getElementById(`chk-${ex.id}`).checked;
-        const weight = document.getElementById(`wt-${ex.id}`).value.trim();
-        const reps = document.getElementById(`rep-${ex.id}`).value.trim();
-        const note = document.getElementById(`nt-${ex.id}`).value.trim();
-
         if (isDone) completedCount++;
-
         itemsRecorded.push({
           name: ex.name,
           done: isDone,
-          weight: weight || ex.defaultWeight,
-          reps: reps || ex.defaultReps,
-          note: note,
+          weight: document.getElementById(`wt-${ex.id}`).value || document.getElementById(`wt-${ex.id}`).placeholder.replace('Last: ', ''),
+          reps: document.getElementById(`rep-${ex.id}`).value || document.getElementById(`rep-${ex.id}`).placeholder.replace('Last: ', ''),
+          note: document.getElementById(`nt-${ex.id}`).value,
           isExam: ex.tags && ex.tags.includes('PI-Exam')
         });
       });
 
       const newLog = {
         id: 'log_' + Date.now(),
-        date: dateString,
-        time: timeString,
-        dayNum: currentDay,
+        date: `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`,
+        time: `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`,
+        sessionNum: currentSession,
+        cycleNum: activeCycle,
         title: dayData.title,
         completedCount: completedCount,
         totalItems: dayData.exercises.length,
@@ -681,59 +785,54 @@
       };
 
       currentLogs.unshift(newLog);
-      localStorage.setItem('pi_workout_logs_v2', JSON.stringify(currentLogs));
+      localStorage.setItem('pi_workout_logs_v3', JSON.stringify(currentLogs));
 
+      // Advance Progression
+      calculateProgress();
       updateTotalStats();
-      showToast(`Saved: ${completedCount}/${dayData.exercises.length} Exercises`);
+      renderDaySelector();
+      selectDay(currentSession);
       
-      setTimeout(() => { switchTab('history'); }, 600);
+      showToast(`Saved! Advanced to Session ${currentSession}`);
+      setTimeout(() => { switchTab('history'); }, 800);
     }
 
     function updateTotalStats() {
-      document.getElementById('totalLogsCount').innerText = currentLogs.length;
+      const totalEl = document.getElementById('totalLogsCount');
+      const cycleEl = document.getElementById('currentCycleCount');
+      if (totalEl) totalEl.innerText = currentLogs.length;
+      if (cycleEl) cycleEl.innerText = activeCycle;
     }
 
     function renderHistoryLogs() {
       const container = document.getElementById('historyLogsContainer');
-      if (!currentLogs || currentLogs.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-12 text-slate-500 glass-panel rounded-3xl border border-dashed border-slate-700">
-            <div class="text-4xl mb-3 opacity-50">📭</div>
-            <p class="font-bold text-sm">No Logs Yet</p>
-            <p class="text-xs mt-1">Save a workout to see history here.</p>
-          </div>
-        `;
+      if (currentLogs.length === 0) {
+        container.innerHTML = `<div class="text-center py-12 text-slate-500 glass-panel rounded-3xl border border-dashed border-slate-700"><div class="text-4xl mb-3 opacity-50">📭</div><p class="font-bold text-sm">No Logs Yet</p></div>`;
         return;
       }
-
       container.innerHTML = currentLogs.map(log => {
         const rate = Math.round((log.completedCount / log.totalItems) * 100);
-        let rateColor = rate === 100 ? 'text-brand-success' : (rate > 50 ? 'text-brand-accent' : 'text-slate-400');
-        
         return `
-        <div class="glass-panel rounded-3xl p-5 border border-brand-border/50" id="${log.id}">
+        <div class="glass-panel rounded-3xl p-5 border border-brand-border/50">
           <div class="flex justify-between items-start mb-4 border-b border-slate-700/50 pb-3">
             <div>
-              <div class="text-sm font-black text-white tracking-wide">${log.date} <span class="text-brand-textMuted text-[10px] font-bold ml-1">${log.time}</span></div>
-              <div class="text-[11px] font-bold text-brand-accent mt-0.5">${log.title}</div>
+              <div class="text-sm font-black text-white">${log.date} <span class="text-brand-textMuted text-[10px] ml-1">${log.time}</span></div>
+              <div class="text-[11px] font-bold text-brand-accent mt-0.5">Sess ${log.sessionNum} (Cycle ${log.cycleNum}) | ${log.title}</div>
             </div>
             <div class="text-right">
-              <div class="text-[11px] font-black ${rateColor} bg-slate-900 px-2 py-1 rounded-lg">Score: ${rate}%</div>
-              <button onclick="requestDelete('${log.id}')" class="text-[10px] text-brand-exam font-bold mt-2 hover:underline">Delete Log</button>
+              <div class="text-[11px] font-black ${rate===100?'text-brand-success':'text-brand-accent'} bg-slate-900 px-2 py-1 rounded-lg">Score: ${rate}%</div>
+              <button onclick="deleteLog('${log.id}')" class="text-[10px] text-brand-exam font-bold mt-2 hover:underline">Delete</button>
             </div>
           </div>
-          
           <div class="flex flex-col gap-2">
             ${log.items.map(it => `
               <div class="flex justify-between items-start text-xs">
-                <div class="flex-1 pr-2 ${it.done ? 'text-slate-200 font-bold' : 'text-slate-500 line-through font-medium'}">
-                  ${it.done ? '<span class="text-brand-success mr-1">✓</span>' : '<span class="text-slate-600 mr-1">○</span>'} 
-                  ${it.name} 
-                  ${it.isExam ? '<span class="text-white bg-brand-exam ml-1 text-[8px] font-black px-1 rounded uppercase">PI</span>' : ''}
+                <div class="flex-1 pr-2 ${it.done?'text-slate-200 font-bold':'text-slate-500 line-through'}">
+                  ${it.done?'<span class="text-brand-success mr-1">✓</span>':'<span class="text-slate-600 mr-1">○</span>'} 
+                  ${it.name}${it.isExam?'<span class="text-white bg-brand-exam ml-1 text-[8px] font-black px-1 rounded uppercase">PI</span>':''}
                 </div>
                 <div class="text-brand-accent font-bold text-right shrink-0 bg-slate-900 px-2 py-0.5 rounded flex flex-col items-end">
                   <span>${it.weight !== '-' ? it.weight + ' x ' : ''}${it.reps}</span>
-                  ${it.note ? `<span class="text-[9px] text-slate-400 font-medium">Note: ${it.note}</span>` : ''}
                 </div>
               </div>
             `).join('')}
@@ -742,128 +841,61 @@
       `}).join('');
     }
 
-    // Custom Modal Logic (Replacing alert/confirm)
-    function showConfirm(title, message, callback) {
-      document.getElementById('modalTitle').innerText = title;
-      document.getElementById('modalMessage').innerText = message;
-      modalCallback = callback;
-      document.getElementById('confirmModal').classList.add('active');
-    }
-
-    function closeModal() {
-      document.getElementById('confirmModal').classList.remove('active');
-      modalCallback = null;
-    }
-
-    document.getElementById('modalConfirmBtn').addEventListener('click', () => {
-      if (modalCallback) modalCallback();
-      closeModal();
-    });
-
-    function requestClearForm() {
-      showConfirm("Clear Inputs", "Are you sure you want to clear all checkboxes and inputs for today?", () => {
-        renderDayPlan(currentDay);
-      });
-    }
-
-    function requestDelete(logId) {
-      showConfirm("Delete Log", "This action cannot be undone. Are you sure?", () => {
-        currentLogs = currentLogs.filter(l => l.id !== logId);
-        localStorage.setItem('pi_workout_logs_v2', JSON.stringify(currentLogs));
-        updateTotalStats();
-        renderHistoryLogs();
-      });
+    function deleteLog(id) {
+      if(confirm("Delete this log? This will affect your Session progression.")) {
+        currentLogs = currentLogs.filter(l => l.id !== id);
+        localStorage.setItem('pi_workout_logs_v3', JSON.stringify(currentLogs));
+        initApp(); // Recalculate everything
+        switchTab('history');
+      }
     }
 
     function startTimer(seconds) {
       stopTimer();
       remainingSeconds = seconds;
       updateTimerDisplay();
-
       timerInterval = setInterval(() => {
         remainingSeconds--;
-        if (remainingSeconds <= 0) {
-          stopTimer();
-          showToast('🔔 Rest Over! Go!');
-          if (navigator.vibrate) navigator.vibrate([200, 100, 300]);
-        }
+        if (remainingSeconds <= 0) { stopTimer(); showToast('🔔 Rest Over!'); if(navigator.vibrate) navigator.vibrate(200); }
         updateTimerDisplay();
       }, 1000);
     }
-
-    function stopTimer() {
-      if (timerInterval) clearInterval(timerInterval);
-      timerInterval = null;
-      remainingSeconds = 0;
-      updateTimerDisplay();
-    }
-
+    function stopTimer() { clearInterval(timerInterval); remainingSeconds = 0; updateTimerDisplay(); }
     function updateTimerDisplay() {
-      const display = document.getElementById('timerDisplay');
-      const m = Math.floor(remainingSeconds / 60);
-      const s = remainingSeconds % 60;
-      display.innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-      
-      if (remainingSeconds > 0 && remainingSeconds <= 10) {
-        display.classList.replace('text-brand-success', 'text-brand-exam');
-      } else {
-        display.classList.replace('text-brand-exam', 'text-brand-success');
-      }
-    }
-
-    function loadHabits() {
-      const today = new Date().toISOString().split('T')[0];
-      if (dailyHabits.date !== today) {
-        dailyHabits = { date: today, creatine: false, water: false };
-        localStorage.setItem('pi_daily_habits_v2', JSON.stringify(dailyHabits));
-      }
-      document.getElementById('chkCreatine').checked = dailyHabits.creatine;
-      document.getElementById('chkWater').checked = dailyHabits.water;
-    }
-
-    function saveHabits() {
-      dailyHabits.creatine = document.getElementById('chkCreatine').checked;
-      dailyHabits.water = document.getElementById('chkWater').checked;
-      localStorage.setItem('pi_daily_habits_v2', JSON.stringify(dailyHabits));
+      const d = document.getElementById('timerDisplay');
+      d.innerText = `${String(Math.floor(remainingSeconds/60)).padStart(2,'0')}:${String(remainingSeconds%60).padStart(2,'0')}`;
+      d.className = `text-3xl font-black tabular-nums leading-none tracking-tight ${remainingSeconds > 0 && remainingSeconds <= 10 ? 'text-brand-exam' : 'text-brand-success'}`;
     }
 
     function showToast(msg) {
-      const toast = document.getElementById('toast');
       document.getElementById('toastMsg').innerText = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+      document.getElementById('toast').classList.add('show');
+      setTimeout(() => document.getElementById('toast').classList.remove('show'), 3000);
     }
 
     function exportData() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentLogs, null, 2));
       const a = document.createElement('a');
-      a.href = dataStr;
-      a.download = `PI_Tracker_Backup_${new Date().toISOString().slice(0,10)}.json`;
-      document.body.appendChild(a);
+      a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentLogs, null, 2));
+      a.download = `PI_Tracker_Backup.json`;
       a.click();
-      a.remove();
     }
 
     function triggerImport() { document.getElementById('importFileInput').click(); }
-    
-    function importData(event) {
-      const file = event.target.files[0];
+    function importData(e) {
+      const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function(ev) {
         try {
-          const imported = JSON.parse(e.target.result);
+          const imported = JSON.parse(ev.target.result);
           if (Array.isArray(imported)) {
             currentLogs = imported;
-            localStorage.setItem('pi_workout_logs_v2', JSON.stringify(currentLogs));
-            updateTotalStats();
-            renderHistoryLogs();
-            showToast('✅ Data Imported Successfully!');
+            localStorage.setItem('pi_workout_logs_v3', JSON.stringify(currentLogs));
+            initApp();
+            switchTab('history');
+            showToast('✅ Data Imported!');
           }
-        } catch (err) { 
-          // Replaced alert with modal
-          showConfirm("Error", "Import failed. Invalid file format.", () => {});
-        }
+        } catch (err) { alert("Import failed."); }
       };
       reader.readAsText(file);
     }
