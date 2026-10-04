@@ -2,9 +2,21 @@
 <html lang="zh-HK" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PI Prep x Lean Legs | Ultimate Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <!-- PWA Setup & Standalone Mode -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0B1120">
+  <title>PI Prep x Lean Legs | V5 Ultimate System</title>
+  
+  <!-- Inline Manifest for PWA -->
+  <link rel="manifest" href='data:application/manifest+json,{"name":"PI Tracker V5","short_name":"PI V5","start_url":".","display":"standalone","background_color":"#0B1120","theme_color":"#0EA5E9","icons":[{"src":"icon.png","sizes":"192x192","type":"image/png"}]}'>
+  <link rel="icon" type="image/png" href="icon.png">
+
+  <!-- Tailwind CSS & Chart.js -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -12,21 +24,13 @@
         extend: {
           colors: {
             brand: {
-              bg: '#0B1120',
-              panel: '#1E293B',
-              border: '#334155',
-              accent: '#0EA5E9',
-              cycle: '#10B981', 
-              diet: '#8B5CF6',  
-              exam: '#EF4444', 
-              success: '#10B981',
-              warning: '#F59E0B',
-              textMuted: '#94A3B8'
+              bg: '#0B1120', panel: '#1E293B', border: '#334155',
+              accent: '#0EA5E9', cycle: '#10B981', diet: '#8B5CF6',  
+              exam: '#EF4444', success: '#10B981', warning: '#F59E0B',
+              elite: '#EAB308', textMuted: '#94A3B8'
             }
           },
-          fontFamily: {
-            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-          }
+          fontFamily: { sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'] }
         }
       }
     }
@@ -54,95 +58,114 @@
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     }
 
+    /* Elite & Exam Highlights */
+    .elite-highlight {
+      box-shadow: 0 0 20px rgba(234, 179, 8, 0.2);
+      border: 1px solid rgba(234, 179, 8, 0.6) !important;
+      background: linear-gradient(145deg, rgba(30,41,59,0.9) 0%, rgba(133, 77, 14, 0.15) 100%);
+    }
+
     .exam-highlight {
       box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
       border: 1px solid rgba(239, 68, 68, 0.4) !important;
       background: linear-gradient(145deg, rgba(30,41,59,0.8) 0%, rgba(127,29,29,0.1) 100%);
     }
     
-    .timer-active {
-      animation: pulse-border 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
+    .timer-active { animation: pulse-border 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     @keyframes pulse-border {
       0%, 100% { border-color: rgba(16, 185, 129, 0.3); box-shadow: 0 -10px 40px rgba(0,0,0,0.3); }
       50% { border-color: rgba(16, 185, 129, 0.8); box-shadow: 0 -10px 40px rgba(16,185,129,0.2); }
     }
 
     .custom-checkbox {
-      appearance: none;
-      -webkit-appearance: none;
-      width: 26px;
-      height: 26px;
-      border: 2px solid #475569;
-      border-radius: 8px;
+      appearance: none; -webkit-appearance: none;
+      width: 26px; height: 26px;
+      border: 2px solid #475569; border-radius: 8px;
       background: rgba(15, 23, 42, 0.4);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      flex-shrink: 0;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0;
     }
-    .custom-checkbox:checked {
-      background: #10B981;
-      border-color: #10B981;
-      transform: scale(1.05);
+    .custom-checkbox:checked { background: #10B981; border-color: #10B981; transform: scale(1.05); }
+    .custom-checkbox:checked::after { content: '✓'; color: #0B1120; font-size: 16px; font-weight: 900; }
+    .diet-checkbox:checked { background: #8B5CF6; border-color: #8B5CF6; }
+
+    /* RPE Slider Styling */
+    .rpe-slider {
+      -webkit-appearance: none; width: 100%; height: 8px; border-radius: 4px;
+      background: linear-gradient(to right, #10B981, #F59E0B, #EF4444);
+      outline: none; opacity: 0.9; transition: opacity .2s;
     }
-    .custom-checkbox:checked::after {
-      content: '✓';
-      color: #0B1120;
-      font-size: 16px;
-      font-weight: 900;
-    }
-    
-    .diet-checkbox:checked {
-      background: #8B5CF6;
-      border-color: #8B5CF6;
+    .rpe-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: #ffffff; border: 2px solid #1E293B; cursor: pointer; box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
 
     .fade-in { animation: fadeIn 0.3s ease-out forwards; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
     #toast {
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
-      transform: translate(-50%, 150px);
-      opacity: 0;
+      transform: translate(-50%, 150px); opacity: 0;
     }
-    #toast.show {
-      transform: translate(-50%, 0);
-      opacity: 1;
+    #toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+      z-index: 100; display: flex; justify-content: center; align-items: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
     }
+    .modal-backdrop.show { opacity: 1; pointer-events: auto; }
   </style>
 </head>
 <body class="antialiased selection:bg-brand-accent selection:text-white">
 
+  <!-- CNS Warning Modal -->
+  <div id="cnsModal" class="modal-backdrop">
+    <div class="glass-panel w-11/12 max-w-sm p-6 rounded-3xl border border-brand-exam/50 transform scale-95 transition-transform duration-300" id="cnsModalContent">
+      <div class="text-5xl text-center mb-4">⚠️</div>
+      <h2 class="text-xl font-black text-brand-exam text-center mb-2">中樞神經系統 (CNS) 疲勞警告</h2>
+      <p class="text-xs text-slate-300 mb-6 text-center leading-relaxed">系統偵測到你連續兩個 Core Session 的 RPE 均達到 8 分或以上。為避免過度訓練導致肌肉受損或成績停滯，強烈建議今日 <span class="text-white font-bold">延長熱身時間 15 分鐘</span> 或提早進入 <span class="text-white font-bold">Active Recovery</span>。</p>
+      <button onclick="closeCnsModal()" class="w-full py-3 bg-slate-800 text-white font-bold rounded-xl border border-slate-700 hover:bg-slate-700 active:scale-95 transition-all">明白，我會調整策略</button>
+    </div>
+  </div>
+
   <div class="max-w-2xl mx-auto p-4">
     
-    <!-- Header -->
+    <!-- Top Header -->
     <header class="flex justify-between items-center pb-4 mb-5 border-b border-brand-border">
       <div>
         <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
-          👮‍♂️ PI Prep <span class="text-brand-accent">x</span> Lean Legs
+          👮‍♂️ PI Prep <span class="text-brand-accent">x</span> Ultimate
         </h1>
-        <p class="text-[11px] text-brand-textMuted mt-1 font-medium tracking-wide uppercase">Module-Based Training System</p>
+        <p class="text-[11px] text-brand-textMuted mt-1 font-medium tracking-wide uppercase">V5 Tactical & Macros Engine</p>
       </div>
-      <div class="flex gap-2">
-        <div class="glass-panel px-3 py-2 rounded-2xl flex flex-col items-end border border-brand-border">
+      <div class="flex gap-2 items-center">
+        <!-- Bodyweight Setting -->
+        <button onclick="setBodyweight()" class="glass-panel px-2.5 py-2 rounded-2xl flex flex-col items-center border border-slate-600 hover:bg-slate-800 transition-colors">
+          <span class="text-[9px] text-brand-textMuted font-bold uppercase tracking-widest">BW(kg)</span>
+          <div class="flex items-center gap-1">
+            <span class="text-sm">⚖️</span>
+            <span class="text-lg font-black text-white tabular-nums leading-none" id="bwDisplay">70</span>
+          </div>
+        </div>
+        <!-- Total Logs Count -->
+        <div class="glass-panel px-2.5 py-2 rounded-2xl flex flex-col items-center border border-brand-border">
           <span class="text-[9px] text-brand-textMuted font-bold uppercase tracking-widest">Total</span>
           <div class="flex items-center gap-1">
             <span class="text-sm">🔥</span>
-            <span class="text-xl font-black text-brand-accent tabular-nums leading-none" id="totalLogsCount">0</span>
+            <span class="text-lg font-black text-brand-accent tabular-nums leading-none" id="totalLogsCount">0</span>
           </div>
         </div>
-        <div class="glass-panel px-3 py-2 rounded-2xl flex flex-col items-end border border-brand-cycle/30 relative overflow-hidden">
+        <!-- Phase/Cycle Count -->
+        <div class="glass-panel px-3 py-2 rounded-2xl flex flex-col items-center border border-brand-cycle/30 relative overflow-hidden">
           <div class="absolute inset-0 bg-brand-cycle/10 pointer-events-none"></div>
           <span class="text-[9px] text-brand-cycle font-bold uppercase tracking-widest relative z-10">Phase</span>
           <div class="flex items-center gap-1 relative z-10">
             <span class="text-sm">🔄</span>
-            <span class="text-xl font-black text-white tabular-nums leading-none">C<span id="currentCycleCount">1</span></span>
+            <span class="text-lg font-black text-white tabular-nums leading-none">C<span id="currentCycleCount">1</span></span>
           </div>
         </div>
       </div>
@@ -156,22 +179,24 @@
       <button id="tabDietBtn" onclick="switchTab('diet')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200">
         🥗 Diet
       </button>
+      <button id="tabChartBtn" onclick="switchTab('chart')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200">
+        📈 Analytics
+      </button>
       <button id="tabHistoryBtn" onclick="switchTab('history')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200">
         📜 History
       </button>
     </nav>
 
-    <!-- Shared Day Selector (Visible on Plan & Diet) -->
+    <!-- Shared Day Selector -->
     <div id="sharedDaySelectorWrapper" class="fade-in mb-6">
       <div class="no-scrollbar flex gap-2 overflow-x-auto pb-2 snap-x">
         <div id="daySelector" class="flex gap-2 w-full"></div>
       </div>
     </div>
 
-    <!-- TAB 1: WORKOUT PLAN -->
     <div id="planView" class="fade-in">
-      <div class="text-xs text-brand-textMuted mb-4 px-1 flex items-center gap-2 font-medium">
-        <span>💡 進度制：準備好再推展下個 Session。</span>
+      <div class="text-xs text-brand-textMuted mb-4 px-1 flex items-center gap-2 font-medium bg-slate-900/50 p-2 rounded-xl border border-slate-800">
+        <span class="text-brand-elite">🤖 V5 智能解析：</span>支援全/半形逗號分隔多組數 (如 50,45 或 3:10，3:15)。系統自動抓取「極限值」並對比 PI 滿分標準。
       </div>
 
       <!-- Day Info Banner -->
@@ -184,7 +209,7 @@
         <!-- Injected via JS -->
       </div>
 
-      <!-- 瘦腿拉筋法則模組 -->
+      <!-- 瘦腿拉筋法則模組 (From V4) -->
       <div class="glass-panel rounded-2xl p-5 mb-6 border border-purple-500/30 bg-purple-900/10 relative overflow-hidden">
         <div class="absolute -right-4 -top-4 text-6xl opacity-10">🦵</div>
         <h3 class="text-sm font-extrabold text-purple-400 mb-3 flex items-center gap-2">
@@ -206,47 +231,48 @@
         </div>
       </div>
 
-      <!-- Session Notes Input -->
-      <div class="mb-6">
-        <label class="block text-xs font-bold text-slate-400 mb-2 pl-1">📝 Session 備註 (外食/狀態紀錄)</label>
-        <textarea id="sessionGlobalNote" rows="2" placeholder="例如：今日核心特別無力、動作流暢..." class="w-full bg-slate-900/60 border border-slate-700 rounded-2xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-accent transition-colors resize-none"></textarea>
+      <!-- RPE & Session Notes Input (V5 + V4 merged) -->
+      <div class="glass-panel rounded-2xl p-5 mb-6 border border-slate-700/60">
+        <label class="block text-xs font-bold text-slate-300 mb-4 flex justify-between items-center">
+          <span>🧠 體感疲勞度 (RPE)</span>
+          <span id="rpeValue" class="text-brand-accent text-sm font-black">5 / 10</span>
+        </label>
+        <input type="range" id="sessionRpe" min="1" max="10" value="5" class="rpe-slider mb-6" oninput="updateRpeDisplay(this.value)">
+        <div class="flex justify-between text-[9px] text-slate-500 font-bold px-1 mb-4">
+          <span>極度輕鬆 (1)</span><span>有點吃力 (5)</span><span>極限力竭 (10)</span>
+        </div>
+        
+        <label class="block text-xs font-bold text-slate-400 mb-2">📝 Session 備註 (狀態紀錄)</label>
+        <textarea id="sessionGlobalNote" rows="2" placeholder="例如：今日核心特別無力、拉體操感覺良好..." class="w-full bg-slate-900/60 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-accent transition-colors resize-none"></textarea>
       </div>
 
       <div class="flex flex-col gap-3 mb-8">
         <button onclick="saveTodayRecord()" class="w-full py-4 bg-brand-accent text-brand-bg font-black rounded-2xl text-[15px] shadow-[0_4px_25px_rgba(14,165,233,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 hover:bg-sky-400">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-          Save Session & Advance
+          Save Session & Analyze
         </button>
       </div>
     </div>
 
-    <!-- TAB 2: DIET & NUTRITION -->
     <div id="dietView" class="hidden fade-in mb-8">
       
       <!-- Microbiome Info Panel -->
       <div id="cycleDietBanner" class="relative overflow-hidden glass-panel rounded-3xl p-5 mb-5 border-l-4 border-l-brand-diet">
         <div class="absolute -right-2 -top-2 text-6xl opacity-10">🦠</div>
         <div class="flex justify-between items-center mb-3 relative z-10">
-          <h2 class="text-[15px] font-black text-white flex items-center gap-2">
-            腸道微生態矩陣
-          </h2>
-          <!-- Cycle Preview Selector -->
+          <h2 class="text-[15px] font-black text-white flex items-center gap-2">腸道微生態矩陣</h2>
           <select id="cyclePreviewSelect" onchange="changeCyclePreview(this.value)" class="text-[10px] font-extrabold px-2 py-1.5 rounded-lg border bg-brand-diet/20 text-brand-diet border-brand-diet/30 uppercase tracking-widest outline-none cursor-pointer">
-            <option value="1">CYCLE 1</option>
-            <option value="2">CYCLE 2</option>
-            <option value="3">CYCLE 3</option>
+            <option value="1">CYCLE 1</option><option value="2">CYCLE 2</option><option value="3">CYCLE 3</option>
           </select>
         </div>
-        <p class="text-[11px] text-slate-300 relative z-10 leading-relaxed font-medium mb-3">
-          防止腸道菌相單一化。透過每 7 個訓練日自動更換蔬菜組合，確保益生菌定植及多元植化素抗氧攝取。
-        </p>
+        <p class="text-[11px] text-slate-300 relative z-10 leading-relaxed font-medium mb-3">防止腸道菌相單一化。透過每 7 個訓練日自動更換蔬菜組合，確保益生菌定植及多元植化素抗氧攝取。</p>
         <div class="bg-slate-900/60 rounded-xl p-3 border border-slate-700/50">
           <div class="text-[10px] font-bold text-brand-textMuted uppercase mb-1">本週期專屬植化素來源：</div>
           <div id="dietCycleVegText" class="text-xs font-bold text-brand-success">載入中...</div>
         </div>
       </div>
 
-      <!-- Daily Habit Checkbox (Purified to Water Only) -->
+      <!-- Daily Habit Checkbox -->
       <h3 class="text-sm font-extrabold text-white mb-3 mt-6">基礎營養任務 (Daily)</h3>
       <div class="glass-panel rounded-2xl p-4 mb-5 border border-slate-700/60">
         <label class="flex items-center gap-3 cursor-pointer">
@@ -255,7 +281,7 @@
         </label>
       </div>
 
-      <!-- Workout Supplements (Hidden on Day 7) -->
+      <!-- Workout Supplements -->
       <div id="workoutSupplementsArea">
         <h3 class="text-sm font-extrabold text-white mb-3 mt-6 flex items-center gap-2">
           <span>運動日專屬補給</span>
@@ -268,12 +294,11 @@
               <span class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 font-medium shadow-sm">🍌 香蕉 1 條</span>
               <span class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 font-medium shadow-sm">🌰 核桃 3-4 粒</span>
             </div>
-            <!-- WALNUT ELECTROLYTE TIP -->
             <div class="bg-slate-900/60 rounded-xl p-3 flex items-start gap-2 mt-2 border border-slate-700">
               <span class="text-base mt-0.5">💡</span>
               <div class="text-[10px] text-slate-300 font-medium leading-relaxed">
                 <strong class="text-brand-success block mb-1">天然電解質優勢:</strong>
-                帶鹽分的核桃不用刻意清洗。微量鹽分能在高強度衝刺或重訓中幫助神經傳導，提升肌肉收縮力。
+                帶鹽分的核桃不用刻意清洗。微量鹽分能在高強度衝刺或重訓中幫助神經傳導，確保握力與起跳爆發。
               </div>
             </div>
           </div>
@@ -293,23 +318,55 @@
         <p class="text-[11px] text-slate-400 font-medium leading-relaxed">今日停用香蕉、核桃與蛋白粉，讓肝臟與腸胃重置。<br><span class="text-brand-success font-bold mt-1 block">*(肌酸維持服用，保持肌肉飽和度)*</span></p>
       </div>
 
-      <!-- Dynamic Meals for Current Session -->
-      <h3 class="text-sm font-extrabold text-white mb-3 mt-6 flex items-center gap-2">
-        <span id="mealSessionTitle">Session 1</span> 全日餐單 (結合營養補給)
+      <!-- Dynamic Meals Container (Complete with 4 Meals) -->
+      <h3 class="text-sm font-extrabold text-white mb-3 mt-6 flex justify-between items-center">
+        <span class="flex items-center gap-2"><span id="mealSessionTitle">Session 1</span> 全日動態餐單</span>
+        <span class="text-[10px] font-bold text-brand-textMuted bg-slate-800 px-2 py-1 rounded">Base: <span id="dietBwDisplay">70</span>kg</span>
       </h3>
       <div id="mealsContainer" class="flex flex-col gap-4">
-        <!-- Injected via JS based on Session and Cycle -->
+        <!-- Injected via JS based on Session, Cycle and BW -->
       </div>
-      
     </div>
 
-    <!-- TAB 3: HISTORY -->
+    <div id="chartView" class="hidden fade-in mb-8">
+      <div class="text-xs text-brand-textMuted mb-4 px-1 flex items-center gap-2 font-medium bg-slate-900/50 p-2 rounded-xl border border-slate-800">
+        <span class="text-brand-elite">📊 V5 戰力分析：</span>系統已提取每次多組訓練的「最佳極限值」並繪製成趨勢，紅線為 PI 滿分標準。
+      </div>
+
+      <!-- Push-up Chart -->
+      <div class="glass-panel rounded-3xl p-4 mb-5 border border-brand-border/50">
+        <h3 class="text-sm font-black text-white mb-1 flex justify-between">
+          <span>掌上壓極限 (Max Reps)</span>
+          <span class="text-brand-exam text-[10px] font-bold bg-brand-exam/20 px-2 py-0.5 rounded">Target: 22</span>
+        </h3>
+        <div class="relative h-48 w-full"><canvas id="chartPushup"></canvas></div>
+      </div>
+
+      <!-- 800m Chart -->
+      <div class="glass-panel rounded-3xl p-4 mb-5 border border-brand-border/50">
+        <h3 class="text-sm font-black text-white mb-1 flex justify-between">
+          <span>800m 跑 (Min Time)</span>
+          <span class="text-brand-exam text-[10px] font-bold bg-brand-exam/20 px-2 py-0.5 rounded">Target: 3m05s</span>
+        </h3>
+        <div class="relative h-48 w-full"><canvas id="chart800m"></canvas></div>
+      </div>
+
+      <!-- Broad Jump Chart -->
+      <div class="glass-panel rounded-3xl p-4 border border-brand-border/50">
+        <h3 class="text-sm font-black text-white mb-1 flex justify-between">
+          <span>立定跳遠 (Max cm)</span>
+          <span class="text-brand-exam text-[10px] font-bold bg-brand-exam/20 px-2 py-0.5 rounded">Target: 53cm</span>
+        </h3>
+        <div class="relative h-48 w-full"><canvas id="chartJump"></canvas></div>
+      </div>
+    </div>
+
     <div id="historyView" class="hidden fade-in mb-8">
       <div class="flex justify-between items-center mb-5">
-        <h3 class="text-base font-extrabold text-white">History & Progress</h3>
+        <h3 class="text-base font-extrabold text-white">History & Parsing</h3>
         <div class="flex gap-2">
-          <button onclick="exportData()" class="px-3 py-2 text-[10px] font-bold glass-panel rounded-xl text-brand-accent hover:bg-slate-800 transition-colors">📤 Export</button>
-          <button onclick="triggerImport()" class="px-3 py-2 text-[10px] font-bold glass-panel rounded-xl text-brand-success hover:bg-slate-800 transition-colors">📥 Import</button>
+          <button onclick="exportData()" class="px-3 py-2 text-[10px] font-bold glass-panel rounded-xl text-brand-accent hover:bg-slate-800 transition-colors border-slate-700">📤 Export</button>
+          <button onclick="triggerImport()" class="px-3 py-2 text-[10px] font-bold glass-panel rounded-xl text-brand-success hover:bg-slate-800 transition-colors border-slate-700">📥 Import</button>
           <input type="file" id="importFileInput" class="hidden" onchange="importData(event)" accept=".json">
         </div>
       </div>
@@ -320,13 +377,10 @@
 
   </div>
 
-  <!-- Floating Rest Timer -->
   <div id="timerContainer" class="fixed bottom-0 left-0 right-0 glass-panel border-t border-brand-border p-4 z-40 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.3)] transition-all duration-300">
     <div class="max-w-2xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-2xl bg-brand-bg flex items-center justify-center border border-slate-700 shadow-inner">
-          <span class="text-2xl">⏱️</span>
-        </div>
+        <div class="w-12 h-12 rounded-2xl bg-brand-bg flex items-center justify-center border border-slate-700 shadow-inner"><span class="text-2xl">⏱️</span></div>
         <div>
           <div class="text-[9px] text-brand-textMuted font-bold uppercase tracking-widest mb-0.5">Rest Timer</div>
           <div class="text-3xl font-black tabular-nums leading-none text-brand-success tracking-tight" id="timerDisplay">00:00</div>
@@ -341,250 +395,254 @@
     </div>
   </div>
 
-  <!-- Toast -->
   <div id="toast" class="fixed bottom-28 left-1/2 z-50 bg-brand-success text-brand-bg font-black text-sm px-6 py-3 rounded-full shadow-[0_10px_30px_rgba(16,185,129,0.3)] flex items-center gap-2 pointer-events-none w-max">
-    <span class="text-lg">✅</span> <span id="toastMsg">Workout Saved!</span>
+    <span class="text-lg">✅</span> <span id="toastMsg">Saved!</span>
   </div>
 
   <script>
     /* =========================================================
-       DATA: Workout Schedule (Sessions 1-7)
+       PWA SERVICE WORKER (Inline via Blob)
        ========================================================= */
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        const CACHE_NAME = 'pi-v5-ultimate-cache-v1';
+        self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(['./']))); });
+        self.addEventListener('fetch', e => { e.respondWith(caches.match(e.request).then(res => res || fetch(e.request))); });
+      `;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log('SW fallback'));
+    }
+
+    /* =========================================================
+       DATA: PI EXAM TARGETS & APP SCHEDULE (V4 Rich Data + V5 Exam IDs)
+       ========================================================= */
+    const EXAM_TARGETS = {
+      'pushup': { target: 22, type: 'max_reps', display: '22 reps', unit: 'reps' },
+      'jump': { target: 53, type: 'max_cm', display: '53cm', unit: 'cm' },
+      'run800': { target: 185, type: 'min_time', display: '3m05s', unit: 's' },
+      'shuttle': { target: 10.78, type: 'min_time', display: '10.78s', unit: 's' }
+    };
+
     const appSchedule = {
       1: {
-        title: "Session 1 | Upper Body & PI Push-ups",
-        typeTag: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
-        typeName: "🔥 CORE",
-        desc: "Push/Pull balance. Builds upper body strength for PI push-ups.",
-        warmup: "Face Pull (Cable) 2x15",
+        title: "Session 1 | Upper Body & PI Push-ups", typeTag: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30", typeName: "🔥 CORE",
+        desc: "Push/Pull balance. Builds upper body strength and extreme grip.", warmup: "Face Pull (Cable) 2x15",
         exercises: [
-          { id: "s1-1", name: "Chest Press Machine", target: "3 x 8-12", rest: "90s", defaultWeight: "-", defaultReps: "8-12", note: "Keep chest up, shoulders down.", tags: ['Chest'] },
-          { id: "s1-2", name: "Lat Pull Down", target: "4 x 8-12", rest: "90s", defaultWeight: "-", defaultReps: "8-12", note: "Pull bar to collarbone.", tags: ['Back'] },
-          { id: "s1-3", name: "Rear Delt Fly (Machine)", target: "3 x 12-15", rest: "60s", defaultWeight: "-", defaultReps: "12-15", note: "Focus on upper back and rear shoulders.", tags: ['Shoulder'] },
-          { id: "s1-4", name: "Bodyweight Push-ups", target: "3 x 70% Max", rest: "90s", defaultWeight: "BW", defaultReps: "Sub-Max", note: "容量累積：每組保留 2-3 次餘力，切勿做到力竭。", tags: ['PI-Exam'] },
-          { id: "s1-5", name: "1-Min Timed Sit-ups", target: "3 x 1 Min", rest: "90s", defaultWeight: "-", defaultReps: "Max", note: "PI EXAM: 維持核心繃緊，下背需緊貼地面。", tags: ['PI-Exam'] }
+          { id: "s1-1", examId: null, name: "Chest Press Machine", target: "3 x 8-12", rest: "90s", defaultWeight: "-", defaultReps: "8-12", note: "Keep chest up, shoulders down.", tags: ['Chest'] },
+          { id: "s1-2", examId: null, name: "Lat Pull Down", target: "4 x 8-12", rest: "90s", defaultWeight: "-", defaultReps: "8-12", note: "Pull bar to collarbone.", tags: ['Back'] },
+          { id: "s1-3", examId: null, name: "Bodyweight Pull-ups", target: "3 x Max", rest: "90s", defaultWeight: "BW", defaultReps: "Max", note: "手握力測試必備：強化背闊肌記憶與極限握力。", tags: ['Handgrip', 'Back'] },
+          { id: "s1-4", examId: null, name: "Rear Delt Fly (Machine)", target: "3 x 12-15", rest: "60s", defaultWeight: "-", defaultReps: "12-15", note: "Focus on upper back and rear shoulders.", tags: ['Shoulder'] },
+          { id: "s1-5", examId: "pushup", name: "Bodyweight Push-ups", target: "Target: 22 reps", rest: "90s", defaultWeight: "BW", defaultReps: "Target: 22", note: "輸入格式示範：25, 20, 15。容量累積，勿做至力竭。", tags: ['PI-Exam'] },
+          { id: "s1-6", examId: null, name: "1-Min Timed Sit-ups", target: "3 x 1 Min", rest: "90s", defaultWeight: "-", defaultReps: "Max", note: "PI EXAM: 維持核心繃緊，下背需緊貼地面。", tags: ['PI-Exam'] }
         ]
       },
       2: {
-        title: "Session 2 | Leg Endurance & Core",
-        typeTag: "bg-slate-600/30 text-slate-400 border-slate-600/50",
-        typeName: "💤 AUX",
-        desc: "Light endurance legs to protect knees. Tactical core finishers.",
-        warmup: "Recumbent Bike 5 mins",
+        title: "Session 2 | Leg Endurance & Core", typeTag: "bg-slate-600/30 text-slate-400 border-slate-600/50", typeName: "💤 AUX",
+        desc: "Light endurance legs to protect knees. Tactical core finishers.", warmup: "Recumbent Bike 5 mins",
         exercises: [
-          { id: "s2-1", name: "Leg Press (High Stance)", target: "3 x 15-20", rest: "60s", defaultWeight: "Light", defaultReps: "15-20", note: "ENDURANCE: High feet placement prevents bulky quads.", tags: ['Lean-Legs'] },
-          { id: "s2-2", name: "Inner/Outer Thigh Machine", target: "3 x 15", rest: "60s", defaultWeight: "-", defaultReps: "15", note: "Stabilizes hips for running.", tags: ['Knee-Health'] },
-          { id: "s2-3", name: "Plank Support", target: "3 x 45-60s", rest: "45s", defaultWeight: "BW", defaultReps: "60s", note: "Tactical core: Anti-rotation.", tags: ['Tactical'] },
-          { id: "s2-4", name: "Tactical Tabata", target: "4 Mins", rest: "10s", defaultWeight: "BW", defaultReps: "4 Mins", note: "20s Work / 10s Rest. Jumping Jacks or Climbers.", tags: ['Tactical'] }
+          { id: "s2-1", examId: null, name: "Leg Press (High Stance)", target: "3 x 15-20", rest: "60s", defaultWeight: "Light", defaultReps: "15-20", note: "ENDURANCE: High feet placement prevents bulky quads.", tags: ['Lean-Legs'] },
+          { id: "s2-2", examId: null, name: "Inner/Outer Thigh Machine", target: "3 x 15", rest: "60s", defaultWeight: "-", defaultReps: "15", note: "Stabilizes hips for running.", tags: ['Knee-Health'] },
+          { id: "s2-3", examId: null, name: "Plank Support", target: "3 x 45-60s", rest: "45s", defaultWeight: "BW", defaultReps: "60s", note: "Tactical core: Anti-rotation.", tags: ['Tactical'] },
+          { id: "s2-4", examId: null, name: "Tactical Tabata", target: "4 Mins", rest: "10s", defaultWeight: "BW", defaultReps: "4 Mins", note: "20s Work / 10s Rest. Jumping Jacks or Climbers.", tags: ['Tactical'] }
         ]
       },
       3: {
-        title: "Session 3 | Swimming HIIT",
-        typeTag: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-        typeName: "🔥 CORE",
-        desc: "Max heart rate without joint impact. Boosts VO2 Max for 800m.",
-        warmup: "150m Slow Swim",
+        title: "Session 3 | Swimming HIIT", typeTag: "bg-purple-500/20 text-purple-400 border-purple-500/30", typeName: "🔥 CORE",
+        desc: "Max heart rate without joint impact. Boosts VO2 Max for 800m.", warmup: "150m Slow Swim",
         exercises: [
-          { id: "s3-1", name: "50m Freestyle Sprint (HIIT)", target: "6-8 Sets", rest: "45s", defaultWeight: "-", defaultReps: "6-8", note: "90% Max effort.", tags: ['VO2-Max'] },
-          { id: "s3-2", name: "Backstroke Cool-down", target: "100m", rest: "Easy", defaultWeight: "-", defaultReps: "100m", note: "Open up chest and relax shoulders.", tags: ['Recovery'] }
+          { id: "s3-1", examId: null, name: "50m Freestyle Sprint (HIIT)", target: "6-8 Sets", rest: "45s", defaultWeight: "-", defaultReps: "6-8", note: "90% Max effort.", tags: ['VO2-Max'] },
+          { id: "s3-2", examId: null, name: "Backstroke Cool-down", target: "100m", rest: "Easy", defaultWeight: "-", defaultReps: "100m", note: "Open up chest and relax shoulders.", tags: ['Recovery'] }
         ]
       },
       4: {
-        title: "Session 4 | PI Agility & Posterior Chain",
-        typeTag: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-        typeName: "🔥 CORE",
-        desc: "The Ultimate Leg Day. 100% no bulky quads. Builds sprint engine.",
-        warmup: "4x10m Shuttle Sprint Drill",
+        title: "Session 4 | PI Agility & Posterior Chain", typeTag: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30", typeName: "🔥 CORE",
+        desc: "The Ultimate Leg Day. 100% no bulky quads. Builds vertical jump.", warmup: "4x10m Shuttle Sprint Drill",
         exercises: [
-          { id: "s4-0", name: "4x10m Shuttle Drill", target: "3 Sets", rest: "120s", defaultWeight: "BW", defaultReps: "3 Sets", note: "PI EXAM: Practice low center of gravity turning.", tags: ['PI-Exam'] },
-          { id: "s4-1", name: "Dumbbell RDL", target: "3 x 10-12", rest: "90s", defaultWeight: "-", defaultReps: "10-12", note: "Push hips back. Key for running speed.", tags: ['Lean-Legs'] },
-          { id: "s4-2", name: "Leg Press (High Stance)", target: "3 x 15", rest: "90s", defaultWeight: "-", defaultReps: "15", note: "Feet high. Pushes power from glutes.", tags: ['Lean-Legs'] },
-          { id: "s4-3", name: "Kettlebell Swing", target: "3 x 15-20", rest: "60s", defaultWeight: "-", defaultReps: "15-20", note: "Explosive hip hinge.", tags: ['Explosive'] },
-          { id: "s4-4", name: "Leg Curl Machine", target: "3 x 12", rest: "60s", defaultWeight: "-", defaultReps: "12", note: "Isolate hamstrings.", tags: ['Knee-Health'] }
+          { id: "s4-0", examId: "shuttle", name: "4x10m Shuttle Drill", target: "Target: 10.78s", rest: "120s", defaultWeight: "BW", defaultReps: "Target: 10.78s", note: "PI EXAM: 練習低重心轉向。輸入示範：10.5, 11.2", tags: ['PI-Exam'] },
+          { id: "s4-1", examId: "jump", name: "Broad Jump (立定跳遠)", target: "Target: 53cm", rest: "90s", defaultWeight: "BW", defaultReps: "Target: 53cm", note: "PI EXAM: 專注每次起跳極限爆發力。輸入示範：55, 52, 50", tags: ['PI-Exam', 'Explosive'] },
+          { id: "s4-2", examId: null, name: "Dumbbell RDL", target: "3 x 10-12", rest: "90s", defaultWeight: "-", defaultReps: "10-12", note: "Push hips back. Key for running speed.", tags: ['Lean-Legs'] },
+          { id: "s4-3", examId: null, name: "Leg Press (High Stance)", target: "3 x 15", rest: "90s", defaultWeight: "-", defaultReps: "15", note: "Feet high. Pushes power from glutes.", tags: ['Lean-Legs'] },
+          { id: "s4-4", examId: null, name: "Kettlebell Swing", target: "3 x 15-20", rest: "60s", defaultWeight: "-", defaultReps: "15-20", note: "Explosive hip hinge.", tags: ['Explosive'] },
+          { id: "s4-5", examId: null, name: "Leg Curl Machine", target: "3 x 12", rest: "60s", defaultWeight: "-", defaultReps: "12", note: "Isolate hamstrings.", tags: ['Knee-Health'] }
         ]
       },
       5: {
-        title: "Session 5 | Upper Sculpt & PI Push-ups",
-        typeTag: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
-        typeName: "🔥 CORE",
-        desc: "Secondary upper body. Sculpting shoulders & testing max push-ups.",
-        warmup: "Dumbbell Y-Raise (Light)",
+        title: "Session 5 | Upper Sculpt & PI Push-ups", typeTag: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30", typeName: "🔥 CORE",
+        desc: "Sculpting shoulders & testing max push-ups + grip endurance.", warmup: "Dumbbell Y-Raise (Light)",
         exercises: [
-          { id: "s5-1", name: "Incline DB Press", target: "3 x 8-12", rest: "90s", defaultWeight: "-", defaultReps: "8-12", note: "Bench at 30 degrees. Focus on upper chest.", tags: ['Chest'] },
-          { id: "s5-2", name: "Seated Cable Row", target: "4 x 10-12", rest: "75s", defaultWeight: "-", defaultReps: "10-12", note: "Squeeze shoulder blades.", tags: ['Back'] },
-          { id: "s5-3", name: "Lateral Raise (DB)", target: "4 x 15", rest: "60s", defaultWeight: "-", defaultReps: "15", note: "Builds V-Taper aesthetics.", tags: ['Shoulder'] },
-          { id: "s5-4", name: "Bodyweight Push-ups", target: "3 x Max", rest: "120s", defaultWeight: "BW", defaultReps: "Max", note: "⚠️ 極限測試：確保動作絕對標準 (Chest to fist height)。若前兩組已力竭，第三組務必改為 Knee Push-ups (跪姿) 補足容量，嚴禁核心塌陷代償，以免考試被 No Count。", tags: ['PI-Exam'] },
-          { id: "s5-5", name: "1-Min Timed Sit-ups", target: "3 x 1 Min", rest: "90s", defaultWeight: "-", defaultReps: "Max", note: "PI EXAM: Max speed.", tags: ['PI-Exam'] }
+          { id: "s5-1", examId: null, name: "Incline DB Press", target: "3 x 8-12", rest: "90s", defaultWeight: "-", defaultReps: "8-12", note: "Bench at 30 degrees. Focus on upper chest.", tags: ['Chest'] },
+          { id: "s5-2", examId: null, name: "Seated Cable Row", target: "4 x 10-12", rest: "75s", defaultWeight: "-", defaultReps: "10-12", note: "Squeeze shoulder blades.", tags: ['Back'] },
+          { id: "s5-3", examId: null, name: "Lateral Raise (DB)", target: "4 x 15", rest: "60s", defaultWeight: "-", defaultReps: "15", note: "Builds V-Taper aesthetics.", tags: ['Shoulder'] },
+          { id: "s5-4", examId: null, name: "Farmer's Walk", target: "3 x 45s", rest: "60s", defaultWeight: "Heavy", defaultReps: "45s", note: "PI EXAM 手握力專項：雙手提最重啞鈴行走，榨乾靜態握力與核心抗側屈。", tags: ['Handgrip', 'Core'] },
+          { id: "s5-5", examId: "pushup", name: "Bodyweight Push-ups", target: "Target: 22 reps", rest: "120s", defaultWeight: "BW", defaultReps: "Target: 22", note: "⚠️ 極限測試：確保動作絕對標準。第三組若力竭務必改為跪姿。", tags: ['PI-Exam'] },
+          { id: "s5-6", examId: null, name: "1-Min Timed Sit-ups", target: "3 x 1 Min", rest: "90s", defaultWeight: "-", defaultReps: "Max", note: "PI EXAM: Max speed.", tags: ['PI-Exam'] }
         ]
       },
       6: {
-        title: "Session 6 | PI 800m Run / Intervals",
-        typeTag: "bg-rose-500/20 text-rose-400 border-rose-500/30",
-        typeName: "🔥 CORE",
-        desc: "Outdoor running. Translating gym strength into track performance.",
-        warmup: "Dynamic Stretches & High Knees",
+        title: "Session 6 | PI 800m Run / Intervals", typeTag: "bg-rose-500/20 text-rose-400 border-rose-500/30", typeName: "🔥 CORE",
+        desc: "Outdoor running. Translating gym strength into track performance.", warmup: "Dynamic Stretches & High Knees",
         exercises: [
-          { id: "s6-1", name: "Run-Walk / 800m Pace", target: "20-25 Mins", rest: "Cont.", defaultWeight: "-", defaultReps: "25 Mins", note: "Adaptation: Jog 2m, Walk 1m. Land mid-foot.", tags: ['Knee-Health'] },
-          { id: "s6-2", name: "Track Intervals (400m x 4)", target: "4 Sets", rest: "150s", defaultWeight: "-", defaultReps: "4 Sets", note: "PI EXAM: 確保充足休息，維持最高品質的極速衝刺。", tags: ['PI-Exam'] }
+          { id: "s6-1", examId: "run800", name: "800m Time Trial", target: "Target: 3m05s", rest: "Max", defaultWeight: "-", defaultReps: "Target: 3m05s", note: "輸入格式示範: 3:02, 3:15 (分:秒或全形：)。系統取最快。", tags: ['PI-Exam'] },
+          { id: "s6-2", examId: null, name: "Track Intervals (400m x 4)", target: "4 Sets", rest: "150s", defaultWeight: "-", defaultReps: "4 Sets", note: "PI EXAM: 確保充足休息，維持最高品質的極速衝刺。", tags: ['PI-Exam', 'VO2-Max'] }
         ]
       },
       7: {
-        title: "Session 7 | Active Recovery",
-        typeTag: "bg-slate-600/30 text-slate-400 border-slate-600/50",
-        typeName: "💤 AUX",
-        desc: "Flush lactic acid, muscle fiber recovery.",
-        warmup: "Deep Breathing",
+        title: "Session 7 | Active Recovery", typeTag: "bg-slate-600/30 text-slate-400 border-slate-600/50", typeName: "💤 AUX",
+        desc: "Flush lactic acid, muscle fiber recovery.", warmup: "Deep Breathing",
         exercises: [
-          { id: "s7-1", name: "Foam Rolling", target: "15 Mins", rest: "-", defaultWeight: "-", defaultReps: "Done", note: "Focus heavily on calves and IT band.", tags: ['Recovery'] },
-          { id: "s7-2", name: "Mental & Nutrition Prep", target: "8 Hrs Sleep", rest: "-", defaultWeight: "-", defaultReps: "Done", note: "Hydrate well today.", tags: ['Recovery'] }
+          { id: "s7-1", examId: null, name: "Foam Rolling", target: "15 Mins", rest: "-", defaultWeight: "-", defaultReps: "Done", note: "Focus heavily on calves and IT band.", tags: ['Recovery'] },
+          { id: "s7-2", examId: null, name: "Mental & Nutrition Prep", target: "8 Hrs Sleep", rest: "-", defaultWeight: "-", defaultReps: "Done", note: "Hydrate well today.", tags: ['Recovery'] }
         ]
       }
     };
 
     /* =========================================================
-       DATA: Microbiome Rotation Matrix (Diet)
+       DATA: Microbiome & Dynamic Diet Blueprints
        ========================================================= */
     const cycleData = {
-      1: {
-        name: "CYCLE 1",
-        desc: "番茄 (茄紅素) + 西蘭花 (十字花科防癌) + 紅蘿蔔 (β-胡蘿蔔素) + 菠菜 (鐵質)。建立穩定的消化基礎。",
-        veg: { v1: "番茄", v2: "西蘭花", v3: "紅蘿蔔", v4: "菠菜" }
-      },
-      2: {
-        name: "CYCLE 2",
-        desc: "洋蔥 (菊糖) + 蘆筍 (低聚果糖) + 三色椒 (維他命C) + 鮮冬菇 (多醣體)。專攻腸道好菌定植，擴大菌相多樣性。",
-        veg: { v1: "洋蔥", v2: "蘆筍", v3: "三色椒", v4: "鮮冬菇" }
-      },
-      3: {
-        name: "CYCLE 3",
-        desc: "南瓜粒 (優質複合碳水) + 紫椰菜 (花青素抗炎) + 翠玉瓜 (高鉀去水腫) + 小棠菜 (鈣質)。強大抗氧化，深層修復肌肉發炎。",
-        veg: { v1: "南瓜粒", v2: "紫椰菜", v3: "翠玉瓜", v4: "小棠菜" }
-      }
+      1: { name: "CYCLE 1", desc: "番茄 (茄紅素) + 西蘭花 (十字花科防癌) + 紅蘿蔔 (β-胡蘿蔔素) + 菠菜 (鐵質)。建立穩定的消化基礎。", veg: { v1: "番茄", v2: "西蘭花", v3: "紅蘿蔔", v4: "菠菜" } },
+      2: { name: "CYCLE 2", desc: "洋蔥 (菊糖) + 蘆筍 (低聚果糖) + 三色椒 (維他命C) + 鮮冬菇 (多醣體)。專攻腸道好菌定植，擴大菌相多樣性。", veg: { v1: "洋蔥", v2: "蘆筍", v3: "三色椒", v4: "鮮冬菇" } },
+      3: { name: "CYCLE 3", desc: "南瓜粒 (優質複合碳水) + 紫椰菜 (花青素抗炎) + 翠玉瓜 (高鉀去水腫) + 小棠菜 (鈣質)。強大抗氧化，深層修復肌肉發炎。", veg: { v1: "南瓜粒", v2: "紫椰菜", v3: "翠玉瓜", v4: "小棠菜" } }
     };
 
-    const mealBlueprints = {
-      1: { 
-        lunch: { meat: "特瘦免治牛肉 150g", carb: "白飯 1 碗", veg: ["[v1]", "[v2]"], method: "電飯煲底層洗米放水放[v1]，飯熟前 5 分鐘鋪[v2]。平底鑊「不落油」乾炒牛肉，灑海鹽黑椒，逼出的牛油汁徹底倒掉，拌勻。" },
-        dinner: { meat: "急凍泰國無骨雞胸 150g", carb: "白飯 1 碗", veg: ["[v3]", "[v4]"], method: "電飯煲洗米放水，將醃好的雞肉與[v3]直接鋪水面按煮飯。飯熟前 5 分鐘鋪[v4]焗熟。" }
-      },
-      2: {
-        lunch: { meat: "急凍泰國無骨雞胸 150g", carb: "白飯 1 碗", veg: ["[v1]", "[v3]"], method: "電飯煲一鍋熟。米、水、[v1]、[v3]、醃好的雞胸全部放入同煮。" },
-        dinner: { meat: "急凍三文魚柳 150g", carb: "白飯半碗", veg: ["[v2]"], method: "電飯煲煮飯，最後 5 分鐘鋪[v2]。三文魚印乾抹海鹽黑椒，平底鑊無油皮朝下先煎逼出魚油，再反面煎熟。" }
-      },
-      3: {
-        lunch: { meat: "特瘦免治牛肉 150g", carb: "白飯 1 碗", veg: ["[v4]"], method: "電飯煲煮飯，最後 5 分鐘鋪[v4]。平底鑊乾炒牛肉去肥油，加海鹽黑椒拌入飯。" },
-        dinner: { meat: "虎蝦肉 150g (極致心肺修復)", carb: "白飯半碗", veg: ["[v3]", "[v2]"], method: "電飯煲洗米放[v3]同煮。最後 5 分鐘，將拌少許鹽黑椒的蝦肉與[v2]鋪面焗熟。蝦鮮甜汁液滲入飯中。" }
-      },
-      4: {
-        lunch: { meat: "特瘦免治牛肉 150g", carb: "白飯 1 碗", veg: ["[v1]", "[v2]"], method: "電飯煲煮飯與[v1]，最後 5 分鐘鋪[v2]。牛肉乾炒去油拌入。" },
-        dinner: { meat: "急凍泰國無骨雞胸 150g", carb: "白飯 1 碗", veg: ["[v4]"], method: "醃好雞胸與飯一鍋熟，最後 5 分鐘鋪[v4]。" }
-      },
-      5: {
-        lunch: { meat: "急凍泰國無骨雞胸 150g", carb: "白飯 1 碗", veg: ["[v1]", "[v3]"], method: "電飯煲一鍋熟（米、[v1]、[v3]、雞肉）。進食次序：先菜後肉再飯，穩定血糖。" },
-        dinner: { meat: "急凍三文魚柳 150g (抗壓荷爾蒙)", carb: "白飯半碗", veg: ["[v4]"], method: "飯與[v4]電飯煲處理（菜最後5分落）。三文魚無油乾煎，用鍋中魚油拌[v4]吃。" }
-      },
-      6: {
-        lunch: { meat: "特瘦免治牛肉 150g", carb: "白飯 1 碗", veg: ["[v3]", "[v2]"], method: "飯與[v3]同煮，最後5分鐘鋪[v2]。牛肉乾炒去油。最強鐵質應付田徑。" },
-        dinner: { meat: "虎蝦肉 150g (神經修復)", carb: "白飯半碗", veg: ["[v1]", "[v4]"], method: "飯與[v1]同煮，最後 5 分鐘鋪入調味蝦肉與[v4]焗熟。" }
-      },
-      7: {
-        lunch: { meat: "急凍泰國無骨雞胸 150g (輕量排毒)", carb: "白飯半碗", veg: ["[v1]", "[v2]"], method: "飯、[v1]、雞肉一鍋熟，[v2]最後 5 分鐘落。" },
-        dinner: { meat: "急凍三文魚柳 150g (好脂肪重置)", carb: "白飯半碗", veg: ["[v3]", "[v4]"], method: "飯與[v3]同煮，[v4]最後5分鐘落。三文魚無油乾煎。早點休息。" }
+    function getDynamicMeals(sessNum, vMap, bw) {
+      let pGrams = Math.round(bw * 2.2 / 3); // Dynamic Protein
+      let cOverload = Math.round(bw * 3.5);  // Dynamic Carb Overload
+      
+      let lunchStr = "", dinnerStr = "", lunchMeth = "", dinnerMeth = "";
+
+      if(sessNum===1) {
+        lunchStr = `特瘦免治牛肉 ${pGrams}g`; lunchMeth = `平底鑊「不落油」乾炒牛肉。飯菜熟透盛起後，強制淋上 <span class='text-brand-success font-bold'>1 湯匙初榨橄欖油</span> (潤滑關節與荷爾蒙合成)。`;
+        dinnerStr = `急凍泰國無骨雞胸 ${pGrams}g`; dinnerMeth = `電飯煲將醃好的雞肉與[v3]同煮，飯熟前 5 分鐘鋪[v4]。盛起後淋上 <span class='text-brand-success font-bold'>1 湯匙初榨橄欖油</span>。`;
+      } else if (sessNum===2) {
+        lunchStr = `急凍泰國無骨雞胸 ${pGrams}g`; lunchMeth = `電飯煲一鍋熟。盛起後淋上 <span class='text-brand-success font-bold'>1 湯匙初榨橄欖油</span>。`;
+        dinnerStr = `急凍三文魚柳 ${pGrams}g (自帶魚油)`; dinnerMeth = `為明日 HIIT 啟動肝醣超載，強制換番薯。三文魚無油皮朝下乾煎，用鍋中魚油拌菜。(本餐不加橄欖油)`;
+      } else if (sessNum===3) {
+        lunchStr = `特瘦免治牛肉 ${pGrams}g`; lunchMeth = `賽前強力充碳。牛肉乾炒去肥油，盛起後連同蔬菜淋上 <span class='text-brand-success font-bold'>1 湯匙初榨橄欖油</span>。`;
+        dinnerStr = `虎蝦肉 ${pGrams}g (極致心肺修復)`; dinnerMeth = `電飯煲處理飯菜與蝦。盛起後淋上 <span class='text-brand-success font-bold'>1 湯匙初榨橄欖油</span>。`;
+      } else if (sessNum===4) {
+        lunchStr = `特瘦免治牛肉 ${pGrams}g`; lunchMeth = `牛肉乾炒去油。盛起後淋上 <span class='text-brand-success font-bold'>1 湯匙初榨橄欖油</span>。`;
+        dinnerStr = `急凍泰國無骨雞胸 ${pGrams}g`; dinnerMeth = `醃好雞胸與飯一鍋熟。盛起後淋上 <span class='text-brand-success font-bold'>1 湯匙初榨橄欖油</span>。`;
+      } else if (sessNum===5) {
+        lunchStr = `急凍泰國無骨雞胸 ${pGrams}g`; lunchMeth = `電飯煲一鍋熟。盛起後淋上 <span class='text-brand-success font-bold'>1 湯匙初榨橄欖油</span>。`;
+        dinnerStr = `急凍三文魚柳 ${pGrams}g (抗壓荷爾蒙)`; dinnerMeth = `為明日 800m 啟動肝醣超載。三文魚無油乾煎，用鍋中魚油拌[v4]吃。(本餐不加橄欖油)`;
+      } else if (sessNum===6) {
+        lunchStr = `特瘦免治牛肉 ${pGrams}g`; lunchMeth = `田徑最強鐵質與肝醣充載。盛起後淋上 <span class='text-brand-success font-bold'>1 湯匙初榨橄欖油</span>。`;
+        dinnerStr = `虎蝦肉 ${pGrams}g (神經修復)`; dinnerMeth = `飯菜同煮。盛起後淋上 <span class='text-brand-success font-bold'>1 湯匙初榨橄欖油</span>。`;
+      } else {
+        lunchStr = `急凍泰國無骨雞胸 ${pGrams}g (輕量排毒)`; lunchMeth = `一鍋熟。盛起後淋上 <span class='text-brand-success font-bold'>1 湯匙初榨橄欖油</span>。`;
+        dinnerStr = `急凍三文魚柳 ${pGrams}g (好脂肪重置)`; dinnerMeth = `三文魚無油乾煎。(本餐不加橄欖油)。早點休息。`;
       }
-    };
+
+      let blueprints = {
+        1: { L_carb: "白飯 1 碗", L_veg: ["[v1]", "[v2]"], D_carb: "白飯 1 碗", D_veg: ["[v3]", "[v4]"] },
+        2: { L_carb: "白飯 1 碗", L_veg: ["[v1]", "[v3]"], D_carb: `蒸/烤番薯 ${cOverload}g (超載準備)`, D_veg: ["[v2]"] },
+        3: { L_carb: `蒸/烤番薯 ${cOverload}g (極致超載)`, L_veg: ["[v4]"], D_carb: "白飯半碗", D_veg: ["[v3]", "[v2]"] },
+        4: { L_carb: "白飯 1 碗", L_veg: ["[v1]", "[v2]"], D_carb: "白飯 1 碗", D_veg: ["[v4]"] },
+        5: { L_carb: "白飯 1 碗", L_veg: ["[v1]", "[v3]"], D_carb: `蒸/烤番薯 ${cOverload}g (超載準備)`, D_veg: ["[v4]"] },
+        6: { L_carb: `蒸/烤番薯 ${cOverload}g (極致超載)`, L_veg: ["[v3]", "[v2]"], D_carb: "白飯半碗", D_veg: ["[v1]", "[v4]"] },
+        7: { L_carb: "白飯半碗", L_veg: ["[v1]", "[v2]"], D_carb: "白飯半碗", D_veg: ["[v3]", "[v4]"] }
+      };
+
+      let L = blueprints[sessNum];
+      return {
+        lunch: { meat: lunchStr, carb: L.L_carb, veg: L.L_veg, method: lunchMeth },
+        dinner: { meat: dinnerStr, carb: L.D_carb, veg: L.D_veg, method: dinnerMeth }
+      };
+    }
 
     /* =========================================================
-       APP STATE & LOGIC
+       APP STATE & CORE LOGIC
        ========================================================= */
-    let currentLogs = JSON.parse(localStorage.getItem('pi_workout_logs_v3') || '[]');
-    let currentSession = 1;
-    let activeCycle = 1;
-    let previewCycle = 1; // Used for UI checking different cycles in Diet tab
+    let currentLogs = JSON.parse(localStorage.getItem('pi_logs_v5_ultimate') || '[]');
+    let userSettings = JSON.parse(localStorage.getItem('pi_settings_v5_ultimate') || '{"bw": 70}');
+    let currentBW = userSettings.bw;
     
-    let timerInterval = null;
-    let targetEndTime = 0;
-    
+    let currentSession = 1, activeCycle = 1, previewCycle = 1;
+    let timerInterval = null, targetEndTime = 0;
     let historyRenderLimit = 20;
 
-    // Timezone safe getters
     function getHKDate() { return new Date().toLocaleDateString('en-CA', {timeZone: 'Asia/Hong_Kong'}); }
     function getHKTime() { return new Date().toLocaleTimeString('en-GB', {timeZone: 'Asia/Hong_Kong', hour: '2-digit', minute:'2-digit'}); }
 
     function calculateProgress() {
-      const totalCompleted = currentLogs.length;
-      activeCycle = Math.floor(totalCompleted / 7) % 3 + 1; // 1, 2, 3 loop
-      currentSession = (totalCompleted % 7) + 1; // 1 to 7
-      previewCycle = activeCycle; // reset preview
+      let progressState = JSON.parse(localStorage.getItem('pi_progress_v5_ultimate') || '{"cycle": 1, "session": 1}');
+      activeCycle = progressState.cycle; currentSession = progressState.session;
+      previewCycle = activeCycle;
       document.getElementById('cyclePreviewSelect').value = previewCycle;
     }
 
     function initApp() {
       calculateProgress();
+      document.getElementById('bwDisplay').innerText = currentBW;
+      document.getElementById('dietBwDisplay').innerText = currentBW;
+      
+      checkCnsFatigue(); // V5 Logic
       updateTotalStats();
       renderDaySelector();
       selectDay(currentSession);
-      loadWaterHabit();
+      
+      let storedHabit = JSON.parse(localStorage.getItem('pi_diet_water_v5_ultimate') || '{}');
+      document.getElementById('dietHabitWater').checked = (storedHabit.date === getHKDate()) ? storedHabit.h1 : false;
+    }
+
+    function setBodyweight() {
+      let input = prompt("輸入當前體重 (kg) 以啟動 V5 動態宏量營養精算 (影響午晚餐及肝醣超載比例)：", currentBW);
+      if(input && !isNaN(input)) {
+        currentBW = parseFloat(input);
+        userSettings.bw = currentBW;
+        localStorage.setItem('pi_settings_v5_ultimate', JSON.stringify(userSettings));
+        document.getElementById('bwDisplay').innerText = currentBW;
+        document.getElementById('dietBwDisplay').innerText = currentBW;
+        renderDietPlan(selectedUIdays, previewCycle);
+        showToast("已重算動態專屬餐單份量");
+      }
     }
 
     function switchTab(tab) {
-      const planView = document.getElementById('planView');
-      const dietView = document.getElementById('dietView');
-      const historyView = document.getElementById('historyView');
-      const sharedDaySelector = document.getElementById('sharedDaySelectorWrapper');
+      ['planView', 'dietView', 'chartView', 'historyView'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      ['tabPlanBtn', 'tabDietBtn', 'tabChartBtn', 'tabHistoryBtn'].forEach(id => document.getElementById(id).className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200 bg-transparent");
       
-      const tabPlanBtn = document.getElementById('tabPlanBtn');
-      const tabDietBtn = document.getElementById('tabDietBtn');
-      const tabHistoryBtn = document.getElementById('tabHistoryBtn');
-
-      // Reset
-      planView.classList.add('hidden');
-      dietView.classList.add('hidden');
-      historyView.classList.add('hidden');
+      const sharedSelector = document.getElementById('sharedDaySelectorWrapper');
       
-      tabPlanBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200 bg-transparent";
-      tabDietBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200 bg-transparent";
-      tabHistoryBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400 hover:text-slate-200 bg-transparent";
-
-      if (tab === 'plan') {
-        sharedDaySelector.classList.remove('hidden');
-        planView.classList.remove('hidden');
-        tabPlanBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-brand-accent text-brand-bg shadow-[0_0_20px_rgba(14,165,233,0.3)]";
-      } else if (tab === 'diet') {
-        sharedDaySelector.classList.remove('hidden');
-        dietView.classList.remove('hidden');
-        tabDietBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-brand-diet text-white shadow-[0_0_20px_rgba(139,92,246,0.3)]";
+      if(tab==='plan'){
+        sharedSelector.classList.remove('hidden');
+        document.getElementById('planView').classList.remove('hidden');
+        document.getElementById('tabPlanBtn').className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-brand-accent text-brand-bg shadow-[0_0_20px_rgba(14,165,233,0.3)]";
+      } else if(tab==='diet'){
+        sharedSelector.classList.remove('hidden');
+        document.getElementById('dietView').classList.remove('hidden');
+        document.getElementById('tabDietBtn').className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-brand-diet text-white shadow-[0_0_20px_rgba(139,92,246,0.3)]";
+      } else if(tab==='chart'){
+        sharedSelector.classList.add('hidden');
+        document.getElementById('chartView').classList.remove('hidden');
+        document.getElementById('tabChartBtn').className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.3)]";
+        renderCharts();
       } else {
-        sharedDaySelector.classList.add('hidden');
-        historyView.classList.remove('hidden');
-        tabHistoryBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-brand-accent text-brand-bg shadow-[0_0_20px_rgba(14,165,233,0.3)]";
-        historyRenderLimit = 20; // reset
+        sharedSelector.classList.add('hidden');
+        document.getElementById('historyView').classList.remove('hidden');
+        document.getElementById('tabHistoryBtn').className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-brand-accent text-brand-bg shadow-[0_0_20px_rgba(14,165,233,0.3)]";
+        historyRenderLimit = 20;
         renderHistoryLogs();
       }
     }
 
+    let selectedUIdays = 1;
     function renderDaySelector() {
-      const container = document.getElementById('daySelector');
       let html = '';
-      for (let i = 1; i <= 7; i++) {
-        const isCore = [1, 3, 4, 5, 6].includes(i);
-        const isSelected = i === currentSession;
-        const isLocked = i > currentSession; // Simple visual cue
+      for(let i=1; i<=7; i++) {
+        let isCore = [1, 3, 4, 5, 6].includes(i);
+        let isSelected = (i === currentSession);
+        let isLocked = (i > currentSession);
         
-        html += `
-          <div onclick="selectDay(${i})" id="pill-${i}" 
-               class="min-w-[70px] flex-1 py-2.5 px-1 rounded-2xl border border-brand-border transition-all flex flex-col items-center justify-center relative
-               ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-               ${isSelected ? 'border-brand-success bg-brand-success/10' : 'glass-panel hover:bg-slate-800/50'}">
-            <span class="text-xs font-bold text-slate-300 name-span mb-0.5">Sess ${i}</span>
-            ${isCore ? `<span class="text-[9px] text-brand-accent font-extrabold tracking-wide uppercase">Core</span>` : `<span class="text-[9px] text-slate-500 font-bold uppercase tracking-wide">Aux</span>`}
-          </div>
-        `;
+        html += `<div onclick="selectDay(${i})" id="pill-${i}" class="min-w-[70px] flex-1 py-2.5 px-1 rounded-2xl border border-brand-border transition-all flex flex-col items-center justify-center relative ${isLocked?'opacity-50 cursor-not-allowed':'cursor-pointer'} ${isSelected?'border-brand-success bg-brand-success/10':'glass-panel hover:bg-slate-800/50'}">
+          <span class="text-xs font-bold text-slate-300 name-span mb-0.5">Sess ${i}</span>
+          ${isCore ? `<span class="text-[9px] text-brand-accent font-extrabold tracking-wide uppercase sub-span">Core</span>` : `<span class="text-[9px] text-slate-500 font-bold uppercase tracking-wide sub-span">Aux</span>`}
+        </div>`;
       }
-      container.innerHTML = html;
+      document.getElementById('daySelector').innerHTML = html;
     }
 
-    // Handles picking a day on both Plan and Diet tab
-    let selectedUIdays = 1;
     function selectDay(sessNum) {
       selectedUIdays = sessNum;
       for (let i = 1; i <= 7; i++) {
@@ -594,29 +652,22 @@
             pill.classList.add('bg-brand-accent', 'border-brand-accent');
             pill.classList.remove('glass-panel', 'bg-brand-success/10', 'hover:bg-slate-800/50', 'opacity-50');
             pill.querySelector('.name-span').classList.replace('text-slate-300', 'text-brand-bg');
-            pill.querySelector('span:last-child').classList.replace('text-brand-accent', 'text-brand-bg');
-            pill.querySelector('span:last-child').classList.replace('text-slate-500', 'text-brand-bg/70');
+            pill.querySelector('.sub-span').classList.replace('text-brand-accent', 'text-brand-bg');
+            pill.querySelector('.sub-span').classList.replace('text-slate-500', 'text-brand-bg/70');
             pill.style.boxShadow = "0 4px 20px rgba(14,165,233,0.3)";
           } else {
             pill.classList.remove('bg-brand-accent', 'border-brand-accent');
             pill.classList.add('glass-panel');
             if(i > currentSession) pill.classList.add('opacity-50');
             pill.querySelector('.name-span').classList.replace('text-brand-bg', 'text-slate-300');
-            pill.querySelector('span:last-child').classList.replace('text-brand-bg', 'text-brand-accent');
-            pill.querySelector('span:last-child').classList.replace('text-brand-bg/70', 'text-slate-500');
+            pill.querySelector('.sub-span').classList.replace('text-brand-bg', 'text-brand-accent');
+            pill.querySelector('.sub-span').classList.replace('text-brand-bg/70', 'text-slate-500');
             pill.style.boxShadow = "none";
           }
         }
       }
-
-      renderWorkoutPlan(sessNum);
-      renderDietPlan(sessNum, previewCycle); 
+      renderWorkoutPlan(sessNum); renderDietPlan(sessNum, previewCycle); 
       document.getElementById(`pill-${sessNum}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
-
-    function changeCyclePreview(cycleVal) {
-      previewCycle = parseInt(cycleVal);
-      renderDietPlan(selectedUIdays, previewCycle);
     }
 
     function renderWorkoutPlan(sessNum) {
@@ -640,7 +691,7 @@
         const cardClass = isExam ? "exam-highlight" : "border-brand-border/60";
         const tags = ex.tags ? ex.tags.map(t => `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${t==='PI-Exam'?'bg-brand-exam text-white':'bg-slate-700 text-slate-300'} uppercase tracking-wide">${t}</span>`).join('') : '';
 
-        // Past data auto-fill & overload visual logic
+        // V4/V5 Past Data Overload Visual Logic
         let histWeight = ex.defaultWeight;
         let histReps = ex.defaultReps;
         let hasPastData = false;
@@ -649,13 +700,11 @@
            const pastRecord = log.items.find(i => i.name === ex.name);
            if (pastRecord && pastRecord.weight && pastRecord.weight !== "-") {
               histWeight = pastRecord.weight; 
-              histReps = pastRecord.reps; 
-              hasPastData = true;
-              break;
+              histReps = pastRecord.rawReps || pastRecord.reps; 
+              hasPastData = true; break;
            }
         }
 
-        // Highlight inputs if there is a past record to beat (Progressive Overload UI)
         let wtInputClass = hasPastData ? "bg-slate-800 border-brand-accent ring-1 ring-brand-accent text-brand-accent placeholder-brand-accent/70" : "bg-slate-900 border-slate-700 text-brand-accent placeholder-brand-accent/50";
         let repInputClass = hasPastData ? "bg-slate-800 border-brand-success ring-1 ring-brand-success text-brand-success placeholder-brand-success/70" : "bg-slate-900 border-slate-700 text-white placeholder-slate-500";
 
@@ -682,47 +731,38 @@
           </div>
         </div>
       `}).join('');
+      
+      document.getElementById('sessionRpe').value = 5; updateRpeDisplay(5);
     }
 
     function toggleCheck(id, isExam, restStr) {
-      const chk = document.getElementById(`chk-${id}`);
-      const card = document.getElementById(`card-${id}`);
-      const title = document.getElementById(`title-${id}`);
-      
+      const chk = document.getElementById(`chk-${id}`), card = document.getElementById(`card-${id}`), title = document.getElementById(`title-${id}`);
       if (chk.checked) {
-        card.classList.add('bg-brand-success/10', 'border-brand-success/40');
-        card.classList.remove('exam-highlight', 'border-brand-border/60');
-        title.classList.add('line-through', 'text-brand-textMuted');
-        title.classList.remove('text-white');
-        const match = restStr.match(/(\d+)/);
-        if (match) startTimer(parseInt(match[1]));
+        card.classList.add('bg-brand-success/10', 'border-brand-success/40'); card.classList.remove('exam-highlight', 'border-brand-border/60');
+        title.classList.add('line-through', 'text-brand-textMuted'); title.classList.remove('text-white');
+        const match = restStr.match(/(\d+)/); if (match) startTimer(parseInt(match[1]));
       } else {
         card.classList.remove('bg-brand-success/10', 'border-brand-success/40');
-        title.classList.remove('line-through', 'text-brand-textMuted');
-        title.classList.add('text-white');
-        stopTimer();
-        card.classList.add(isExam ? 'exam-highlight' : 'border-brand-border/60');
+        title.classList.remove('line-through', 'text-brand-textMuted'); title.classList.add('text-white');
+        stopTimer(); card.classList.add(isExam ? 'exam-highlight' : 'border-brand-border/60');
       }
     }
+    
+    function updateRpeDisplay(val) {
+      document.getElementById('rpeValue').innerText = `${val} / 10`;
+      document.getElementById('rpeValue').className = `text-sm font-black ${val>=8?'text-brand-exam':val>=5?'text-warning':'text-brand-success'}`;
+    }
+
+    function changeCyclePreview(cycleVal) { previewCycle = parseInt(cycleVal); renderDietPlan(selectedUIdays, previewCycle); }
 
     function renderDietPlan(sessNum, cycle) {
       document.getElementById('dietCycleVegText').innerText = cycleData[cycle].desc;
-      
-      const supArea = document.getElementById('workoutSupplementsArea');
-      const recArea = document.getElementById('day7RecoveryArea');
-      
-      if (sessNum === 7) {
-        supArea.classList.add('hidden');
-        recArea.classList.remove('hidden');
-      } else {
-        supArea.classList.remove('hidden');
-        recArea.classList.add('hidden');
-      }
-
+      const supArea = document.getElementById('workoutSupplementsArea'), recArea = document.getElementById('day7RecoveryArea');
+      if (sessNum === 7) { supArea.classList.add('hidden'); recArea.classList.remove('hidden'); } else { supArea.classList.remove('hidden'); recArea.classList.add('hidden'); }
       document.getElementById('mealSessionTitle').innerText = `Session ${sessNum}`;
       
       const vMap = cycleData[cycle].veg;
-      const blueprint = mealBlueprints[sessNum];
+      const mealsData = getDynamicMeals(sessNum, vMap, currentBW);
 
       const renderMealCard = (type, data, supplement = null) => {
         let finalVegStr = "";
@@ -738,9 +778,7 @@
 
         let finalMethod = "";
         if (data.method) {
-            finalMethod = data.method
-            .replace(/\[v1\]/g, vMap.v1).replace(/\[v2\]/g, vMap.v2)
-            .replace(/\[v3\]/g, vMap.v3).replace(/\[v4\]/g, vMap.v4);
+            finalMethod = data.method.replace(/\[v1\]/g, vMap.v1).replace(/\[v2\]/g, vMap.v2).replace(/\[v3\]/g, vMap.v3).replace(/\[v4\]/g, vMap.v4);
         }
 
         const icon = type.includes('Breakfast') ? '🌅' : type.includes('Lunch') ? '☀️' : type.includes('Snack') ? '☕' : '🌙';
@@ -774,82 +812,95 @@
         `;
       };
 
-      // Integrated Timeline Rendering
+      // V4 Integration: Full 4 meals with exact nutrition principles
       document.getElementById('mealsContainer').innerHTML = 
         renderMealCard('Breakfast', { meat: "雞蛋 2 隻 + 無糖大豆高鈣 250ml", carb: "Cheerios 燕麥圈 40g", veg: ["奇異果 1 個"] }, "黑咖啡 + 維 B 雜 (協同產生 ATP 能量)") + 
-        renderMealCard('Lunch', blueprint.lunch, "維他命 C (將植物性/肉類的三價鐵 Fe3+ 還原為二價鐵 Fe2+，大幅提升吸收率)") + 
+        renderMealCard('Lunch', mealsData.lunch, "維他命 C (將植物性/肉類的三價鐵 Fe3+ 還原為二價鐵 Fe2+，大幅提升吸收率)") + 
         renderMealCard('Snack (下午茶)', { meat: "無糖脫脂希臘乳酪 150g", carb: "", veg: [] }, "穩定血糖、補足酪蛋白與腸道益生菌") +
-        renderMealCard('Dinner', blueprint.dinner);
+        renderMealCard('Dinner', mealsData.dinner);
     }
 
-    function loadWaterHabit() {
-      const today = getHKDate();
-      let stored = JSON.parse(localStorage.getItem('pi_diet_habits_water_v3') || '{}');
-      if (stored.date !== today) stored = { date: today, h1: false };
-      document.getElementById('dietHabitWater').checked = stored.h1;
-    }
-    
-    function saveWaterHabit() {
-      localStorage.setItem('pi_diet_habits_water_v3', JSON.stringify({
-        date: getHKDate(),
-        h1: document.getElementById('dietHabitWater').checked
-      }));
+    function saveWaterHabit() { localStorage.setItem('pi_diet_water_v5_ultimate', JSON.stringify({date: getHKDate(), h1: document.getElementById('dietHabitWater').checked})); }
+
+    function parseBestSet(inputStr, examId) {
+      if(!inputStr || !examId) return { best: null, raw: inputStr };
+      let type = EXAM_TARGETS[examId].type;
+      
+      // Handle both half-width and full-width commas
+      let vals = inputStr.split(/[,，]/).map(s => s.trim());
+      
+      if(type === 'min_time') {
+        let secs = vals.map(v => {
+          // Handle both half-width and full-width colons
+          if(v.includes(':') || v.includes('：')) { 
+            let [m,s] = v.split(/[:：]/); 
+            return parseInt(m)*60 + parseFloat(s); 
+          }
+          return parseFloat(v);
+        }).filter(n => !isNaN(n));
+        return { best: secs.length ? Math.min(...secs) : null, raw: inputStr };
+      } else {
+        let nums = vals.map(v => parseFloat(v)).filter(n => !isNaN(n));
+        return { best: nums.length ? Math.max(...nums) : null, raw: inputStr };
+      }
     }
 
     function saveTodayRecord() {
       const dayData = appSchedule[currentSession];
-      let completedCount = 0;
-      let itemsRecorded = [];
+      let completedCount = 0; let itemsRecorded = [];
       const globalNote = document.getElementById('sessionGlobalNote').value.trim();
+      let rpe = parseInt(document.getElementById('sessionRpe').value);
 
       dayData.exercises.forEach(ex => {
         const isDone = document.getElementById(`chk-${ex.id}`).checked;
         if (isDone) completedCount++;
         let wtVal = document.getElementById(`wt-${ex.id}`).value || document.getElementById(`wt-${ex.id}`).placeholder.replace('Last: ', '');
-        let repVal = document.getElementById(`rep-${ex.id}`).value || document.getElementById(`rep-${ex.id}`).placeholder.replace('Last: ', '');
+        let repVal = document.getElementById(`rep-${ex.id}`).value || document.getElementById(`rep-${ex.id}`).placeholder.replace('Last: ', '').replace('Target: ', '');
+        
+        let parsed = parseBestSet(repVal, ex.examId);
         
         itemsRecorded.push({
-          name: ex.name,
-          done: isDone,
-          weight: wtVal,
-          reps: repVal,
+          name: ex.name, done: isDone, weight: wtVal,
+          rawReps: parsed.raw, bestValue: parsed.best,
           note: document.getElementById(`nt-${ex.id}`).value,
-          isExam: ex.tags && ex.tags.includes('PI-Exam')
+          examId: ex.examId, isExam: ex.tags && ex.tags.includes('PI-Exam')
         });
       });
 
       const newLog = {
-        id: 'log_' + Date.now(),
-        date: getHKDate(),
-        time: getHKTime(),
-        sessionNum: currentSession,
-        cycleNum: activeCycle, // Always lock the save to actual progression
-        title: dayData.title,
-        completedCount: completedCount,
-        totalItems: dayData.exercises.length,
-        items: itemsRecorded,
-        globalNote: globalNote
+        id: 'log_' + Date.now(), date: getHKDate(), time: getHKTime(),
+        sessionNum: currentSession, cycleNum: activeCycle, title: dayData.title, typeName: dayData.typeName,
+        completedCount: completedCount, totalItems: dayData.exercises.length,
+        items: itemsRecorded, globalNote: globalNote, rpe: rpe
       };
 
       currentLogs.unshift(newLog);
-      localStorage.setItem('pi_workout_logs_v3', JSON.stringify(currentLogs));
+      localStorage.setItem('pi_logs_v5_ultimate', JSON.stringify(currentLogs));
+      
+      currentSession++;
+      if (currentSession > 7) { currentSession = 1; activeCycle = (activeCycle % 3) + 1; }
+      localStorage.setItem('pi_progress_v5_ultimate', JSON.stringify({cycle: activeCycle, session: currentSession}));
       
       document.getElementById('sessionGlobalNote').value = '';
-
-      calculateProgress();
-      updateTotalStats();
-      renderDaySelector();
-      selectDay(currentSession);
+      calculateProgress(); updateTotalStats(); renderDaySelector(); selectDay(currentSession);
       
-      showToast(`Saved! Advanced to Session ${currentSession}`);
+      showToast(`Saved & Analyzed!`);
       setTimeout(() => { switchTab('history'); }, 800);
     }
 
+    function checkCnsFatigue() {
+      let coreLogs = currentLogs.filter(l => l.typeName && l.typeName.includes('CORE'));
+      if(coreLogs.length >= 2) {
+        if(coreLogs[0].rpe >= 8 && coreLogs[1].rpe >= 8) {
+          if (coreLogs[0].date === getHKDate()) return; // Already saved today
+          document.getElementById('cnsModal').classList.add('show');
+        }
+      }
+    }
+    function closeCnsModal() { document.getElementById('cnsModal').classList.remove('show'); }
     function updateTotalStats() {
-      const totalEl = document.getElementById('totalLogsCount');
-      const cycleEl = document.getElementById('currentCycleCount');
-      if (totalEl) totalEl.innerText = currentLogs.length;
-      if (cycleEl) cycleEl.innerText = activeCycle;
+      if(document.getElementById('totalLogsCount')) document.getElementById('totalLogsCount').innerText = currentLogs.length;
+      if(document.getElementById('currentCycleCount')) document.getElementById('currentCycleCount').innerText = activeCycle;
     }
 
     function renderHistoryLogs() {
@@ -861,17 +912,62 @@
 
       const logsToRender = currentLogs.slice(0, historyRenderLimit);
       
-      let html = logsToRender.map(log => {
+      let html = logsToRender.map((log, idx) => {
         const rate = Math.round((log.completedCount / log.totalItems) * 100);
+        let hasElite = false;
+
+        let itHtml = log.items.map(it => {
+          let statusBadge = '';
+          if(it.examId && it.bestValue !== null) {
+             let target = EXAM_TARGETS[it.examId].target;
+             let isMin = EXAM_TARGETS[it.examId].type === 'min_time';
+             let isElite = isMin ? (it.bestValue <= target) : (it.bestValue >= target);
+             
+             let prevLogWithEx = currentLogs.slice(idx+1).find(l => l.items.find(i => i.examId === it.examId));
+             let prevBest = prevLogWithEx ? prevLogWithEx.items.find(i => i.examId === it.examId).bestValue : null;
+             let isProgress = false, isRegress = false;
+             
+             if(prevBest !== null) {
+               isProgress = isMin ? (it.bestValue < prevBest) : (it.bestValue > prevBest);
+               isRegress = isMin ? (it.bestValue >= prevBest) : (it.bestValue <= prevBest);
+             }
+
+             if(isElite) { statusBadge = `<span class="bg-brand-elite text-black text-[9px] px-1 rounded font-black ml-1 shadow-[0_0_10px_rgba(234,179,8,0.5)]">MAX SCORE</span>`; hasElite = true; }
+             else if(isProgress) { statusBadge = `<span class="bg-brand-success text-black text-[9px] px-1 rounded font-black ml-1">PASS (UP)</span>`; }
+             else if(isRegress) { statusBadge = `<span class="bg-brand-exam text-white text-[9px] px-1 rounded font-black ml-1">WARNING</span>`; }
+          }
+
+          let displayVal = it.rawReps;
+          if (it.examId && it.bestValue) {
+             if (EXAM_TARGETS[it.examId].type === 'min_time') displayVal = `${Math.floor(it.bestValue/60)}m${it.bestValue%60}s`;
+             else displayVal = `${it.bestValue} ${EXAM_TARGETS[it.examId].unit}`;
+          }
+
+          return `
+            <div class="flex justify-between items-start text-xs border-b border-slate-700/30 pb-2 mb-2 last:border-0 last:mb-0 last:pb-0">
+              <div class="flex-1 pr-2 ${it.done?'text-slate-200 font-bold':'text-slate-500 line-through'}">
+                ${it.done?'<span class="text-brand-success mr-1">✓</span>':'<span class="text-slate-600 mr-1">○</span>'} 
+                ${it.name}${it.isExam?'<span class="text-white bg-brand-exam ml-1 text-[8px] font-black px-1 rounded uppercase tracking-wide">PI</span>':''}
+                ${statusBadge}
+                ${it.note ? `<div class="text-[10px] text-slate-500 font-normal mt-1 ml-4 bg-slate-900/50 p-1 rounded">📝 ${it.note}</div>` : ''}
+              </div>
+              <div class="text-brand-accent font-bold text-right shrink-0 bg-slate-900 px-2 py-1 rounded flex flex-col items-end">
+                <span>${it.weight !== '-' ? it.weight + ' x ' : ''}${displayVal}</span>
+                ${it.examId && it.rawReps && (it.rawReps.includes(',') || it.rawReps.includes('，')) ? `<span class="text-[9px] text-slate-500 font-normal mt-0.5">From: ${it.rawReps}</span>` : ''}
+              </div>
+            </div>`;
+        }).join('');
+
         return `
-        <div class="glass-panel rounded-3xl p-5 border border-brand-border/50">
+        <div class="glass-panel rounded-3xl p-5 border transition-all ${hasElite ? 'elite-highlight' : 'border-brand-border/50'}">
           <div class="flex justify-between items-start mb-4 border-b border-slate-700/50 pb-3">
             <div>
               <div class="text-sm font-black text-white">${log.date} <span class="text-brand-textMuted text-[10px] ml-1">${log.time}</span></div>
-              <div class="text-[11px] font-bold text-brand-accent mt-0.5">Sess ${log.sessionNum} (Cycle ${log.cycleNum}) | ${log.title}</div>
+              <div class="text-[11px] font-bold text-brand-accent mt-0.5">Sess ${log.sessionNum} (C${log.cycleNum}) | ${log.title}</div>
+              <div class="text-[10px] font-bold mt-1 ${log.rpe>=8?'text-brand-exam':log.rpe>=5?'text-warning':'text-brand-success'}">🧠 RPE: ${log.rpe || '-'}/10</div>
             </div>
             <div class="text-right">
-              <div class="text-[11px] font-black ${rate===100?'text-brand-success':'text-brand-accent'} bg-slate-900 px-2 py-1 rounded-lg">Score: ${rate}%</div>
+              <div class="text-[11px] font-black ${rate===100?'text-brand-success':'text-brand-accent'} bg-slate-900 px-2 py-1 rounded-lg border border-slate-700">Score: ${rate}%</div>
               <button onclick="deleteLog('${log.id}')" class="text-[10px] text-brand-exam font-bold mt-2 hover:underline">Delete</button>
             </div>
           </div>
@@ -882,123 +978,113 @@
             <p class="text-[11px] text-amber-100/90 leading-relaxed font-medium">${log.globalNote}</p>
           </div>
           ` : ''}
-
-          <div class="flex flex-col gap-2">
-            ${log.items.map(it => `
-              <div class="flex justify-between items-start text-xs">
-                <div class="flex-1 pr-2 ${it.done?'text-slate-200 font-bold':'text-slate-500 line-through'}">
-                  ${it.done?'<span class="text-brand-success mr-1">✓</span>':'<span class="text-slate-600 mr-1">○</span>'} 
-                  ${it.name}${it.isExam?'<span class="text-white bg-brand-exam ml-1 text-[8px] font-black px-1 rounded uppercase">PI</span>':''}
-                </div>
-                <div class="text-brand-accent font-bold text-right shrink-0 bg-slate-900 px-2 py-0.5 rounded flex flex-col items-end">
-                  <span>${it.weight !== '-' ? it.weight + ' x ' : ''}${it.reps}</span>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `}).join('');
+          <div class="flex flex-col">${itHtml}</div>
+        </div>`;
+      }).join('');
 
       if (currentLogs.length > historyRenderLimit) {
         html += `<button onclick="loadMoreHistory()" class="w-full py-3 mt-2 text-xs font-bold text-brand-textMuted glass-panel rounded-2xl hover:bg-slate-800 transition-colors border border-slate-700/50">⬇️ Load More (${currentLogs.length - historyRenderLimit} remaining)</button>`;
       }
-
       container.innerHTML = html;
     }
 
-    function loadMoreHistory() {
-      historyRenderLimit += 20;
-      renderHistoryLogs();
-    }
-
+    function loadMoreHistory() { historyRenderLimit += 20; renderHistoryLogs(); }
     function deleteLog(id) {
-      if(confirm("Delete this log? This will affect your Session progression.")) {
+      if(confirm("Delete this log? (Your current Session progression will NOT be affected)")) {
         currentLogs = currentLogs.filter(l => l.id !== id);
-        localStorage.setItem('pi_workout_logs_v3', JSON.stringify(currentLogs));
-        initApp(); // Recalculate everything
-        switchTab('history');
+        localStorage.setItem('pi_logs_v5_ultimate', JSON.stringify(currentLogs));
+        renderHistoryLogs(); updateTotalStats();
       }
     }
 
-    // Timer Logic & Background Throttling Fix
+    let charts = {};
+    function renderCharts() {
+      const generateChartData = (examId) => {
+        let dataPts = currentLogs.slice().reverse().map(l => {
+          let item = l.items.find(i => i.examId === examId);
+          return item && item.bestValue ? { x: l.date.substring(5), y: item.bestValue } : null;
+        }).filter(d => d !== null);
+        return dataPts;
+      };
+
+      const chartConfig = (ctxId, data, target, color, labelY) => {
+        let ctx = document.getElementById(ctxId).getContext('2d');
+        if(charts[ctxId]) charts[ctxId].destroy();
+        let targetLine = data.map(d => target);
+        
+        charts[ctxId] = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.map(d => d.x),
+            datasets: [
+              { label: 'Your Best', data: data.map(d => d.y), borderColor: color, backgroundColor: color+'40', tension: 0.3, fill: true, pointRadius: 4, borderWidth: 2 },
+              { label: 'Target', data: targetLine, borderColor: '#EF4444', borderDash: [5,5], pointRadius: 0, borderWidth: 1 }
+            ]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { 
+              x: { ticks: { color: '#94A3B8', font:{size:9} }, grid: { color: '#334155' } },
+              y: { ticks: { color: '#94A3B8', font:{size:9} }, grid: { color: '#334155' }, title: {display: true, text: labelY, color:'#94A3B8', font:{size:9}} }
+            }
+          }
+        });
+      };
+
+      chartConfig('chartPushup', generateChartData('pushup'), 22, '#0EA5E9', 'Reps');
+      chartConfig('chart800m', generateChartData('run800'), 185, '#10B981', 'Seconds');
+      chartConfig('chartJump', generateChartData('jump'), 53, '#8B5CF6', 'cm');
+    }
+
     function startTimer(seconds) {
-      stopTimer();
-      targetEndTime = Date.now() + seconds * 1000;
-      updateTimerDisplay(seconds);
+      stopTimer(); targetEndTime = Date.now() + seconds * 1000; updateTimerDisplay(seconds);
       document.getElementById('timerContainer').classList.add('timer-active');
-      
       timerInterval = setInterval(() => {
         let remaining = Math.round((targetEndTime - Date.now()) / 1000);
-        if (remaining <= 0) { 
-          stopTimer(); 
-          showToast('🔔 Rest Over!'); 
-          if(navigator.vibrate) navigator.vibrate([200, 100, 200]); 
-        } else {
-          updateTimerDisplay(remaining);
-        }
+        if (remaining <= 0) { stopTimer(); showToast('🔔 Rest Over!'); if(navigator.vibrate) navigator.vibrate([200, 100, 200]); } 
+        else { updateTimerDisplay(remaining); }
       }, 200);
     }
-
     function stopTimer() { 
-      clearInterval(timerInterval); 
-      timerInterval = null;
-      updateTimerDisplay(0); 
+      clearInterval(timerInterval); timerInterval = null; updateTimerDisplay(0); 
       document.getElementById('timerContainer').classList.remove('timer-active');
     }
-
     function updateTimerDisplay(remainingSeconds) {
-      const d = document.getElementById('timerDisplay');
-      if (remainingSeconds < 0) remainingSeconds = 0;
+      const d = document.getElementById('timerDisplay'); if (remainingSeconds < 0) remainingSeconds = 0;
       d.innerText = `${String(Math.floor(remainingSeconds/60)).padStart(2,'0')}:${String(remainingSeconds%60).padStart(2,'0')}`;
       d.className = `text-3xl font-black tabular-nums leading-none tracking-tight ${remainingSeconds > 0 && remainingSeconds <= 10 ? 'text-brand-exam' : 'text-brand-success'}`;
     }
 
-    // Fix for iOS/Android throttling setInterval in background
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && timerInterval && targetEndTime) {
         let remaining = Math.round((targetEndTime - Date.now()) / 1000);
-        if (remaining > 0) {
-          updateTimerDisplay(remaining);
-        } else {
-          stopTimer();
-        }
+        remaining > 0 ? updateTimerDisplay(remaining) : stopTimer();
       }
     });
 
     function showToast(msg) {
-      document.getElementById('toastMsg').innerText = msg;
-      document.getElementById('toast').classList.add('show');
+      document.getElementById('toastMsg').innerText = msg; document.getElementById('toast').classList.add('show');
       setTimeout(() => document.getElementById('toast').classList.remove('show'), 3000);
     }
 
     function exportData() {
       const a = document.createElement('a');
       a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentLogs, null, 2));
-      a.download = `PI_Tracker_Backup_${getHKDate()}.json`;
-      a.click();
+      a.download = `PI_V5_Ultimate_Backup_${getHKDate()}.json`; a.click();
     }
-
     function triggerImport() { document.getElementById('importFileInput').click(); }
-    
     function importData(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+      const file = e.target.files[0]; if (!file) return;
       const reader = new FileReader();
       reader.onload = function(ev) {
         try {
           const imported = JSON.parse(ev.target.result);
-          if (Array.isArray(imported) && imported.every(i => i.id && i.items)) {
-            currentLogs = imported;
-            localStorage.setItem('pi_workout_logs_v3', JSON.stringify(currentLogs));
-            initApp();
-            switchTab('history');
-            showToast('✅ Data Imported!');
-          } else {
-            throw new Error("Invalid Format");
-          }
-        } catch (err) { 
-          alert("Import failed. Unrecognized file format."); 
-        }
+          if (Array.isArray(imported)) {
+            currentLogs = imported; localStorage.setItem('pi_logs_v5_ultimate', JSON.stringify(currentLogs));
+            localStorage.removeItem('pi_progress_v5_ultimate'); initApp(); switchTab('history'); showToast('✅ Data Imported!');
+          } else throw new Error();
+        } catch (err) { alert("Import failed. Unrecognized file format."); }
       };
       reader.readAsText(file);
     }
