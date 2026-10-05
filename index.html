@@ -302,14 +302,15 @@
           <div class="mb-4">
             <div class="text-xs font-bold text-white mb-2 flex items-center gap-1.5"><span class="text-sm">⚡</span> 運動前 45 分鐘</div>
             <div class="flex gap-2 mb-2">
+              <span class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 font-medium shadow-sm">☕ 黑咖啡</span>
               <span class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 font-medium shadow-sm">🍌 香蕉 1 條</span>
               <span class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 font-medium shadow-sm">🌰 核桃 3-4 粒</span>
             </div>
             <div class="bg-slate-900/60 rounded-xl p-3 flex items-start gap-2 mt-2 border border-slate-700">
               <span class="text-base mt-0.5">💡</span>
               <div class="text-[10px] text-slate-300 font-medium leading-relaxed">
-                <strong class="text-brand-success block mb-1">天然電解質優勢:</strong>
-                帶鹽分的核桃不用刻意清洗。微量鹽分能在高強度衝刺或重訓中幫助神經傳導，確保握力與起跳爆發。
+                <strong class="text-brand-success block mb-1">神經刺激與電解質:</strong>
+                黑咖啡化為純粹的賽前中樞神經刺激 (氮泵)，配合香蕉快速碳水與核桃微量鹽分，完美催動握力與爆發力。
               </div>
             </div>
           </div>
@@ -318,6 +319,13 @@
             <div class="flex gap-2">
               <span class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 font-medium shadow-sm">🥛 蛋白粉 1 殼</span>
               <span class="text-[11px] bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 font-medium shadow-sm">🧪 肌酸 5g</span>
+            </div>
+            <div class="bg-slate-900/60 rounded-xl p-3 flex items-start gap-2 mt-2 border border-slate-700">
+              <span class="text-base mt-0.5">💡</span>
+              <div class="text-[10px] text-slate-300 font-medium leading-relaxed">
+                <strong class="text-brand-success block mb-1">黃金吸收期:</strong>
+                趁身體處於胰島素微升的液體吸收黃金期，極速將肌酸壓入肌肉細胞。嚴禁將維他命 C 等藥丸混在此刻空腹吞服。
+              </div>
             </div>
           </div>
         </div>
@@ -521,18 +529,19 @@
 
     function getDynamicMeals(sessNum, vMap, bw) {
       let pGrams = Math.round(bw * 2.2 / 3); // Dynamic Protein
+      let meatGrams = Math.round(pGrams * 4.5); // Fixed Raw Meat Weight ~ 4.5x protein
       let cOverload = Math.round(bw * 3.5);  // Dynamic Carb Overload
       
       let lunchStr = "", dinnerStr = "", lunchType = "", dinnerType = "";
 
       // Meal Type Assignment
-      if(sessNum===1) { lunchStr = `特瘦免治牛肉 ${pGrams}g`; lunchType = 'beef'; dinnerStr = `急凍泰國無骨雞胸 ${pGrams}g`; dinnerType = 'chicken'; }
-      else if (sessNum===2) { lunchStr = `急凍泰國無骨雞胸 ${pGrams}g`; lunchType = 'chicken'; dinnerStr = `急凍三文魚柳 ${pGrams}g (自帶魚油)`; dinnerType = 'salmon'; }
-      else if (sessNum===3) { lunchStr = `特瘦免治牛肉 ${pGrams}g`; lunchType = 'beef'; dinnerStr = `虎蝦肉 ${pGrams}g (極致心肺修復)`; dinnerType = 'prawn'; }
-      else if (sessNum===4) { lunchStr = `特瘦免治牛肉 ${pGrams}g`; lunchType = 'beef'; dinnerStr = `急凍泰國無骨雞胸 ${pGrams}g`; dinnerType = 'chicken'; }
-      else if (sessNum===5) { lunchStr = `急凍泰國無骨雞胸 ${pGrams}g`; lunchType = 'chicken'; dinnerStr = `急凍三文魚柳 ${pGrams}g (抗壓荷爾蒙)`; dinnerType = 'salmon'; }
-      else if (sessNum===6) { lunchStr = `特瘦免治牛肉 ${pGrams}g`; lunchType = 'beef'; dinnerStr = `虎蝦肉 ${pGrams}g (神經修復)`; dinnerType = 'prawn'; }
-      else { lunchStr = `急凍泰國無骨雞胸 ${pGrams}g (輕量排毒)`; lunchType = 'chicken'; dinnerStr = `急凍三文魚柳 ${pGrams}g (好脂肪重置)`; dinnerType = 'salmon'; }
+      if(sessNum===1) { lunchStr = `特瘦免治牛肉 ${meatGrams}g`; lunchType = 'beef'; dinnerStr = `急凍泰國無骨雞胸 ${meatGrams}g`; dinnerType = 'chicken'; }
+      else if (sessNum===2) { lunchStr = `急凍泰國無骨雞胸 ${meatGrams}g`; lunchType = 'chicken'; dinnerStr = `急凍三文魚柳 ${meatGrams}g (自帶魚油)`; dinnerType = 'salmon'; }
+      else if (sessNum===3) { lunchStr = `特瘦免治牛肉 ${meatGrams}g`; lunchType = 'beef'; dinnerStr = `虎蝦肉 ${meatGrams}g (極致心肺修復)`; dinnerType = 'prawn'; }
+      else if (sessNum===4) { lunchStr = `特瘦免治牛肉 ${meatGrams}g`; lunchType = 'beef'; dinnerStr = `急凍泰國無骨雞胸 ${meatGrams}g`; dinnerType = 'chicken'; }
+      else if (sessNum===5) { lunchStr = `急凍泰國無骨雞胸 ${meatGrams}g`; lunchType = 'chicken'; dinnerStr = `急凍三文魚柳 ${meatGrams}g (抗壓荷爾蒙)`; dinnerType = 'salmon'; }
+      else if (sessNum===6) { lunchStr = `特瘦免治牛肉 ${meatGrams}g`; lunchType = 'beef'; dinnerStr = `虎蝦肉 ${meatGrams}g (神經修復)`; dinnerType = 'prawn'; }
+      else { lunchStr = `急凍泰國無骨雞胸 ${meatGrams}g (輕量排毒)`; lunchType = 'chicken'; dinnerStr = `急凍三文魚柳 ${meatGrams}g (好脂肪重置)`; dinnerType = 'salmon'; }
 
       let blueprints = {
         1: { L_carb: "白飯 1 碗", L_veg: ["[v1]", "[v2]"], D_carb: "白飯 1 碗", D_veg: ["[v3]", "[v4]"] },
@@ -799,7 +808,7 @@
           }).join(" + ");
         }
 
-        const icon = type.includes('Breakfast') ? '🌅' : type.includes('Lunch') ? '☀️' : type.includes('Snack') ? '☕' : '🌙';
+        const icon = type.includes('Breakfast') ? '🌅' : type.includes('Lunch') ? '☀️' : type.includes('Snack') ? '☕' : type.includes('Sleep') ? '🛌' : '🌙';
 
         return `
           <div class="glass-panel rounded-2xl p-4 border border-slate-700/60 relative overflow-hidden">
@@ -830,12 +839,13 @@
         `;
       };
 
-      // Full 4 meals rendered directly with the strict chef overrides
+      // Full 5 meals rendered directly with the strict chef & nutrition overrides
       document.getElementById('mealsContainer').innerHTML = 
-        renderMealCard('Breakfast', { meat: "雞蛋 2 隻 + 無糖大豆高鈣 250ml", carb: "Cheerios 燕麥圈 40g", veg: ["奇異果 1 個"], method: "混合食用。<span class='text-brand-exam font-bold underline'>(嚴禁添加任何油脂)</span>" }, "黑咖啡 + 維他命 B 雜 (協同產生 ATP 能量)") + 
-        renderMealCard('Lunch', mealsData.lunch, "維他命 C (將植物性/肉類的三價鐵 Fe3+ 還原為二價鐵 Fe2+，大幅提升吸收率)") + 
+        renderMealCard('Breakfast', { meat: "雞蛋 2 隻 + 無糖大豆高鈣 250ml", carb: "Cheerios 燕麥圈 40g", veg: ["奇異果 1 個"], method: "混合食用。<span class='text-brand-exam font-bold underline'>(嚴禁添加任何油脂與黑咖啡)</span>" }, "維他命 B 雜 (完整吸收，啟動全日代謝)") + 
+        renderMealCard('Lunch', mealsData.lunch, "15mg 鋅 + 1000mg 維他命 C (固體食物墊胃防刺激，還原三價鐵Fe3+為Fe2+)") + 
         renderMealCard('Snack (下午茶)', { meat: "無糖脫脂希臘乳酪 150g", carb: "", veg: [], method: "直接食用。<span class='text-brand-exam font-bold underline'>(嚴禁添加任何油脂)</span>" }, "穩定血糖、補足酪蛋白與腸道益生菌") +
-        renderMealCard('Dinner', mealsData.dinner);
+        renderMealCard('Dinner', mealsData.dinner, "100mg CoQ10 + 葉黃素 (脂溶性，跟隨橄欖油/魚油吸收率登頂)") +
+        renderMealCard('Pre-Sleep (睡前 30-60 分鐘)', { method: "空腹配水吞服。<span class='text-brand-success font-bold'>放鬆高壓訓練後的神經與肌肉，輔助深度修復，並與中午的鋅會合完成夜間荷爾蒙合成。</span>" }, "雙甘氨酸鎂 200mg");
     }
 
     function saveWaterHabit() { localStorage.setItem('pi_diet_water_v5_ultimate', JSON.stringify({date: getHKDate(), h1: document.getElementById('dietHabitWater').checked})); }
@@ -1087,11 +1097,40 @@
       setTimeout(() => document.getElementById('toast').classList.remove('show'), 3000);
     }
 
-    function exportData() {
-      const a = document.createElement('a');
-      a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentLogs, null, 2));
-      a.download = `PI_V5_Ultimate_Backup_${getHKDate()}.json`; a.click();
+    async function exportData() {
+      const dataStr = JSON.stringify(currentLogs, null, 2);
+      const fileName = `PI_V5_Ultimate_Backup_${getHKDate()}.json`;
+      
+      try {
+        // 利用 Web Share API 呼叫 iOS 原生分享/儲存介面
+        const file = new File([dataStr], fileName, { type: "application/json" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: 'PI Tracker Backup',
+            files: [file]
+          });
+          showToast('✅ Export Shared!');
+        } else {
+          // Fallback (桌面端瀏覽器)
+          const a = document.createElement('a');
+          a.href = "data:text/json;charset=utf-8," + encodeURIComponent(dataStr);
+          a.download = fileName;
+          a.click();
+          showToast('✅ Export Downloaded!');
+        }
+      } catch(err) {
+        if(err.name !== 'AbortError') {
+          try {
+            // 最強 Fallback: 自動複製 JSON 到剪貼簿
+            await navigator.clipboard.writeText(dataStr);
+            showToast('✅ Data Copied to Clipboard!');
+          } catch(e) {
+            showToast('❌ Export Failed');
+          }
+        }
+      }
     }
+
     function triggerImport() { document.getElementById('importFileInput').click(); }
     function importData(e) {
       const file = e.target.files[0]; if (!file) return;
